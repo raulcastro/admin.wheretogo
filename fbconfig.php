@@ -16,7 +16,7 @@ use Facebook\HttpClients\FacebookHttpable;
 // init app with app id and secret
 FacebookSession::setDefaultApplication( '1725035647798732','f1b4af5e5bc98e5e7ecbdd7cb806869c' );
 // login helper with redirect_uri
-    $helper = new FacebookRedirectLoginHelper('http://admin.wheretogo.dev/fbconfig.php' );
+    $helper = new FacebookRedirectLoginHelper('http://admin.wheretogo.com.mx/fbconfig.php' );
 try {
   $session = $helper->getSessionFromRedirect();
 } catch( FacebookRequestException $ex ) {
