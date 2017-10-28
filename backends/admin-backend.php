@@ -34,22 +34,22 @@ class generalBackend
 	 * @param string $section
 	 * @return array Array with the asked info of the application
 	 */
-	public function loadBackend($section = '', $memberId = '')
+	public function loadBackend($section = '')
 	{
 		$data 		= array();
 		
-// 		Info of the Application
+		// 		Info of the Application
 		
 		$appInfoRow = $this->model->getGeneralAppInfo();
 		
-		$appInfo = array( 
+		$appInfo = array(
 				'title' 		=> $appInfoRow['title'],
 				'siteName' 		=> $appInfoRow['site_name'],
 				'url' 			=> $appInfoRow['url'],
 				'content' 		=> $appInfoRow['content'],
 				'description'	=> $appInfoRow['description'],
 				'keywords' 		=> $appInfoRow['keywords'],
-				'location'		=> $appInfoRow['location'],	
+				'location'		=> $appInfoRow['location'],
 				'creator' 		=> $appInfoRow['creator'],
 				'creatorUrl' 	=> $appInfoRow['creator_url'],
 				'twitter' 		=> $appInfoRow['twitter'],
@@ -60,152 +60,193 @@ class generalBackend
 				'youtube' 		=> $appInfoRow['youtube'],
 				'instagram'		=> $appInfoRow['instagram'],
 				'email'			=> $appInfoRow['email'],
-				'lang'			=> $appInfoRow['lang'],
-				'phone'			=> $appInfoRow['phone']
+				'lang'			=> $appInfoRow['lang']
+				
 		);
 		
 		$data['appInfo'] = $appInfo;
 
-		// Active Users
-		$usersActiveArray 			= $this->model->getActiveUsers();
-		$data['usersActive'] 		= $usersActiveArray;
-		
 		// User Info
 		$userInfoRow 				= $this->model->getUserInfo();
 		$data['userInfo'] 			= $userInfoRow;
 		
-		// Last 20 members
-		$lastMembersArray 			= $this->model->getLastMembers();
-		$data['lastMembers'] 		= $lastMembersArray;
+		// 		Categories
+		$data['categories'] = $this->model->getCategoriesWithCompanies();
 		
-		// Task Info
-		$data['taskInfo']['today'] 		= $this->model->getTotalTodayTasksByMemberId();
-		$data['taskInfo']['pending'] 	= $this->model->getTotalPendingTasksByMemberId();
-		$data['taskInfo']['future'] 	= $this->model->getTotalFutureTasksByMemberId();
-		$data['totalMembers'] 			= $this->model->getTotalMembers();
+		// 		Locations
+		$data['locations'] = $this->model->getLocations();
 		
-		// Condo List
-		$condosArray = $this->model->getAllCondos();
-		$data['condos'] = $condosArray;
+		$data['nCompanies'] = $this->model->getTotalCompanies();
 		
-		switch ($section) 
+		$data['nPromoted'] = $this->model->getTotalMainPromotedCompanies();
+		
+		$data['nNoPublish'] = $this->model->getTotalNotPublisedCompanies();
+		
+		switch ($section)
 		{
-			case 'settings':
-				// 		get All room types
-				$infoArray 	= $this->model->getRoomTypes();
-				$data['types'] 	= $infoArray;
+			case 'companies':
+				// 		get All companies
+				$data['companies'] = $this->model->getCompanies();
 				
-				$infoArray = $this->model->getAllInventoryCategories();
-				$data['categories'] = $infoArray;
+				break;
 				
-				$infoArray = $this->model->getAllCondos();
-				$data['condos'] = $infoArray;
-			break;
-			
-			case 'inventory-category':
-				$infoSection = $this->model->getInVentoryCategoryById($_GET['categoryId']);
-				$data['category'] = $infoSection;
+			case 'promoted':
+				// 		get Promoted companies
+				$data['companies'] = $this->model->getMainPromotedCompanies();
+				break;
 				
-				$inventoryArray = $this->model->getInventoryByCategory($_GET['categoryId']);
-				$data['inventoryArray'] = $inventoryArray;
-			break;
-			
+			case 'byCategory':
+				$data['companies'] = $this->model->getCompaniesByCategoryId($_GET['categoryId']);
+				$data['categoryInfo'] = $this->model->getCategoryInfoById($_GET['categoryId']);
+				break;
+				
+			case 'location':
+				// 		get Promoted companies
+				$data['companies'] = $this->model->getCompaniesByLocation($_GET['locationId']);
+				break;
+				
+			case 'unpublished':
+				// 		get Promoted companies
+				$companiesArray = $this->model->getMainUnpublishedCompanies();
+				$data['companies'] = $companiesArray;
+				break;
+				
+			case 'main-sliders':
+				// 		array of the main sliders
+				$slidersArray = $this->model->getMainSliders();
+				$data['mainSliders'] = $slidersArray;
+				break;
+				
+			case 'edit-company' :
+				$companyId = '';
+				$categoryId = '';
+				
+				if (isset($_GET['company']))
+				{
+					$companyId 		= $_GET['company'];
+				}
+				
+				if (isset($_GET['category']))
+				{
+					$categoryId 		= $_GET['category'];
+				}
+				
+				$background = $this->model->getCompanyLogo($companyId);
+				$data['background'] = $background;
+				
+				$companySeoInfo		  = $this->model->getCompanySeoInfo($companyId);
+				$general	     	  = $this->model->companyInfo($companyId);
+				$lastSlider			  = $this->model->getLastSlider($companyId);
+				$sliders			  = $this->model->getCompanySliders($companyId);
+				$gallery			  = $this->model->getCompanyGaleries($companyId);
+				$social			      = $this->model->getCompanySocialInfo($companyId);
+				$emails           	  = $this->model->getEmails($companyId);
+				$phones               = $this->model->getPhones($companyId);
+				
+				$companyInfo = array(
+						'seo'			=> $companySeoInfo,
+						'logo' 			=> $background,
+						'lastSlider' 	=> $lastSlider,
+						'general'		=> $general,
+						'emails' 		=> $emails,
+						'phones' 		=> $phones,
+						'gallery' 		=> $gallery,
+						'sliders' 		=> $sliders,
+						'social'		=> $social
+				);
+				
+				$data['company'] = $companyInfo;
+				
+				$categoryId	= $general['category'];
+				
+				//		get the category's subcategories
+				$subcategoryArray 		= $this->model->getSubcategoriesByCategoryId($categoryId);
+				$data['subcategories'] 	= $subcategoryArray;
+				
+				$belongSubcategoriesArray 	= $this->model->belongSubcategories($companyId);
+				$data['belongSubcategories'] = $belongSubcategoriesArray;
+				
+				$companiesLocationsArray	= $this->model->getCompanyLocations($companyId);
+				$data['companiesLocations'] = $companiesLocationsArray;
+				
+				// get All Events
+				$data['events'] = $this->model->getEvents();
+				
+				$data['associated'] = $this->model->getEventsByCompany($companyId);
+				break;
+				
+			case 'events' :
+				$companyId 		= $_GET['company'];
+				
+				$categoryId 	= $_GET['category'];
+				
+				// 		get the background file for use as blur
+				$background = $this->model->getCompanyLogo($companyId);
+				$data['background'] = $background;
+				
+				$companySeoInfo		  = $this->model->getCompanySeoInfo($companyId);
+				$general	     	  = $this->model->companyInfo($companyId);
+				$lastSlider			  = $this->model->getLastSlider($companyId);
+				$sliders			  = $this->model->getCompanySliders($companyId);
+				$gallery			  = $this->model->getCompanyGaleries($companyId);
+				$social			      = $this->model->getCompanySocialInfo($companyId);
+				$emails           	  = $this->model->getEmails($companyId);
+				$phones               = $this->model->getPhones($companyId);
+				
+				$companyInfo = array(
+						'seo'			=> $companySeoInfo,
+						'logo' 			=> $background,
+						'lastSlider' 	=> $lastSlider,
+						'general'		=> $general,
+						'emails' 		=> $emails,
+						'phones' 		=> $phones,
+						'gallery' 		=> $gallery,
+						'sliders' 		=> $sliders,
+						'social'		=> $social
+				);
+				
+				$data['company'] = $companyInfo;
+				
+				$categoryId	= $general['category'];
+				
+				//		get the category's subcategories
+				$subcategoryArray 		= $this->model->getSubcategoriesByCategoryId($categoryId);
+				$data['subcategories'] 	= $subcategoryArray;
+				
+				$belongSubcategoriesArray 	= $this->model->belongSubcategories($companyId);
+				$data['belongSubcategories'] = $belongSubcategoriesArray;
+				
+				$companiesLocationsArray	= $this->model->getCompanyLocations($companyId);
+				$data['companiesLocations'] = $companiesLocationsArray;
+				
+				$eventsArray = $this->model->getEventsByCompany($companyId);
+				$data['events'] = $eventsArray;
+				break;
+				
+			case 'videos':
+				
+				$videosArray = $this->model->getVideos();
+				$data['videos'] = $videosArray;
+				
+				break;
+				
 			case 'members':
-				// 		get all members
-				$membersArray 		= $this->model->getAllMembers();
-				$data['members'] 	= $membersArray;
-			break;
-			
-			case 'condo':
-				// 		get rooms by condo
-				$membersArray 		= $this->model->getRoomsByCondo($_GET['condo']);
-				$data['members'] 	= $membersArray;
-			break;
-			
-			case 'rooms':
-				$infoArray 	= $this->model->getRoomTypes();
-				$data['types'] 	= $infoArray;
+				$membersArray = $this->model->getAllMembers();
+				$data['members'] = $membersArray;
+				break;
 				
-				$roomsArray = $this->model->getAllRooms();
-				$data['rooms'] = $roomsArray;
+			case 'member-detail':
+				$memberId = $_GET['member'];
+				$membersInfoRow = $this->model->getMemberDetail($memberId);
+				$data['memberInfo'] = $membersInfoRow;
+				$memberEmailsArray = $this->model->getMemberEmails($memberId);
+				$data['memberEmails'] = $memberEmailsArray;
+				$memberPhonesArray = $this->model->getMemberPhones($memberId);
+				$data['memberPhones'] = $memberPhonesArray;
+				break;
 				
-				$condosArray = $this->model->getAllCondos();
-				$data['condos'] = $condosArray;
-			break;
-			
-			case 'room':
-				$infoArray 	= $this->model->getRoomTypes();
-				$data['types'] 	= $infoArray;
-			
-				$roomsArray = $this->model->getAllRooms();
-				$data['rooms'] = $roomsArray;
-				
-				$roomInfo = $this->model->getRoomById($_GET['roomId']);
-				$data['room'] = $roomInfo;
-				
-				$arrayCategories = $this->model->getAllInventoryCategories();
-				$data['categories'] = $arrayCategories;
-				
-				$arrayLastInventory = $this->model->getLastInventoryList();
-				$data['inventory'] = $arrayLastInventory; 
-				
-				$inventoryArray = $this->model->getRoomInventoryByRoom($_GET['roomId']);
-				$data['roomInventory'] = $inventoryArray;
-			break;
-			
-			case 'member':
-				$memberInfoRow 			= $this->model->getMemberByMemberId($memberId);
-				$data['memberInfo'] 	= $memberInfoRow;
-				
-// 				History
-				$memberHistoryArray 	= $this->model->getMemberHistoryById($memberId);
-				$data['memberHistory'] 	= $memberHistoryArray;
-				
-// 				Tasks
-				$memberTasksArray		= $this->model->getMemberTaskByMemberId($memberId);
-				$data['memberTasks'] 	= $memberTasksArray; 
-				
-				$roomsArray 			= $this->model->getAllRooms();
-				$data['rooms'] 			= $roomsArray;
-				
-				$memberRooms 			= $this->model->getRoomsByMember($memberId);
-				$data['memberRooms'] 	= $memberRooms;
-				
-				$data['messages'] 	= $this->model->getMessagesByMember($memberId);
-				
-				
-			break;
-			
-// 			Tasks
-			case 'tasks':
-				if ($data['userInfo']['type'] == 1)
-					$memberTasksArray	= $this->model->getAllMemberTasks();
-				else
-					$memberTasksArray	= $this->model->getAllTasksByUser();
-				
-				$data['memberTasks'] 	= $memberTasksArray;
-			break;
-			
-			case 'reports':
-				if (!$_GET['from'])
-				{
-					$from = date('Y-m-d', strtotime(' -1 day'));
-					$start = date('Y-m-d', strtotime(' -1 day', strtotime($from)));
-					$end = date('Y-m-d', strtotime(' +31 day', strtotime($from)));
-				}
-				else
-				{
-					$from = date('Y-m-d', strtotime($_GET['from']));
-					$start = date('Y-m-d', strtotime(' -1 day', strtotime($_GET['from'])));
-					$end = date('Y-m-d', strtotime(' +32 day', strtotime($_GET['from'])));
-				}
-				
-				$reservationsArray = $this->model->getReservationsByRange($start, $end);
-				$data['reservations'] = $reservationsArray; 
-			break;
-			
 			default:
-			break;
+				break;
 		}
 		
 		return $data;

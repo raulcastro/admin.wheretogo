@@ -2,10 +2,9 @@
 session_start();
 //	error_reporting(E_ALL);
 //	ini_set("display_errors", 1);
-// 	var_dump($_POST);
+// var_dump($_GET);
 
 $root = $_SERVER['DOCUMENT_ROOT'];
-
 
 if (substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')) ob_start("ob_gzhandler"); else ob_start();
 
@@ -23,9 +22,9 @@ if ($_SESSION['FBID']):
 	{
 		require_once $root.'/backends/admin-backend.php';
 		
-		$data 					= $backend->loadBackend('companies');
+		$data 					= $backend->loadBackend('edit-company');
 		$data['title'] 			= 'Dashboard';
-		$data['section'] 		= 'dashboard';
+		$data['section'] 		= 'settings';
 		$data['template-class'] = '';
 		$data['icon']			= 'fa-dashboard';
 	}
@@ -47,6 +46,6 @@ else :
 	$data['template-class'] = 'login-page';
 endif;
 
-	$view 		= new Layout_View($data);
-	echo $view->printHTMLPage();
+$view 		= new Layout_View($data);
+echo $view->printHTMLPage();
 ?>

@@ -55,15 +55,13 @@ class Layout_Model
 		try {
 			$query = "SELECT 
 					u.user_id,
-					u.type,
+					u.fb_id,
 					d.name, 
-					u.type, 
-					ue.email as user_email, 
-					ue.inbox
+					u.type 
 					FROM users u 
-					LEFT JOIN user_detail d ON u.user_id = d.user_id 
-					LEFT JOIN user_emails ue ON u.user_id = ue.user_id
+					LEFT JOIN user_detail d ON u.user_id = d.user_id
 					WHERE u.user_id = ".$_SESSION['userId'];
+			
 			return $this->db->getRow($query);
 			
 		} catch (Exception $e) {
@@ -72,1321 +70,1970 @@ class Layout_Model
 	}
 	
 	/**
-	 * Get only the active users
+	 * getMainSliders
 	 * 
-	 * @return mixed|bool An array of info or false
+	 * sliders that should be displayed in the index
+	 * @param NULL 
+	 * @return array on succes, false on fail 
 	 */
-	public function getActiveUsers()
+	
+	public function getMainSliders()
 	{
-		try {
-			$query = 'SELECT 
-					ud.user_id, 
-					ud.name 
-					FROM users u 
-					LEFT JOIN user_detail ud ON ud.user_id = u.user_id
-					WHERE u.active = 1  
-					';
-			return $this->db->getArray($query);
-			
-		} catch (Exception $e) {
-			return false;
-		}
+	    try
+	    {
+	        $query = 'SELECT * 
+	        		FROM main_gallery 
+	                ORDER BY picture_id DESC';
+	        return $this->db->getArray($query);
+	    }
+	    catch (Exception $e)
+	    {
+	        return false;
+	    }
 	}
 	
-	public function addMember($data)
+	public function addSlider($name)
 	{
-		try {
-			$query = 'INSERT INTO members
-					(
-					name, 
-					last_name, 
-					address, 
-					phone_one, 
-					phone_two, 
-					email_one, 
-					email_two, 
-					notes, 
-					condo,
-					user_id,
-					date
-					) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE())';
-			
-			$prep = $this->db->prepare($query);
-			
-			$prep->bind_param('sssssssssi', 
-					$data['memberFirst'],
-					$data['memberLast'],
-					$data['memberAddress'],
-					$data['phoneOne'],
-					$data['phoneTwo'],
-					$data['emailOne'],
-					$data['emailTwo'],
-					$data['notes'],
-					$data['memberCondo'],
-					$_SESSION['userId']);
-			
-			if ($prep->execute())
-				return $prep->insert_id;
-			else 
-				printf("Errormessage: %s\n", $prep->error);
-			
-		} catch (Exception $e) {
-			
-			return false;
-		}
-	}
-	
-	public function addUser($data, $member_id)
-	{
-		try {
-			$query = 'INSERT INTO users(user, password, type, active) VALUES(?, SHA1("password"), 1, 1)';
-			$prep = $this->db->prepare($query);
-			$prep->bind_param('s',$data['emailOne']);
-			
-			if ($prep->execute())
-			{
-				$lastId =  $prep->insert_id;
-				$query = 'INSERT INTO user_detail(user_id, name, member_id) VALUES(?, ?, ?)';
-				$prep = $this->db->prepare($query);
-				$prep->bind_param('isi', $lastId, $data['memberFirst'], $member_id);
-				$prep->execute();
-			}
-			
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function updateMember($data)
-	{
-		try {
-			$query = 'UPDATE members
-					SET name 	= ?,
-					last_name 	= ?,
-					address 	= ?,
-					phone_one	= ?,
-					phone_two	= ?,
-					email_one 	= ?,
-					email_two 	= ?,
-					notes 		= ?,
-					condo		= ?
-					WHERE member_id = ?';
-				
-			$prep = $this->db->prepare($query);
-				
-			$prep->bind_param('sssssssssi',
-					$data['memberFirst'],
-					$data['memberLast'],
-					$data['memberAddress'],
-					$data['phoneOne'],
-					$data['phoneTwo'],
-					$data['emailOne'],
-					$data['emailTwo'],
-					$data['notes'],
-					$data['memberCondo'],
-					$data['memberId']
-					);
-				
-			if ($prep->execute())
-			{
-				return $data['memberId'];
-			}
-			else {
-				printf("Errormessage: %s\n", $prep->error);
-			}
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	/**
-	 * Get the last 10 members added
-	 * 
-	 * If the user is an admin then all the members will show
-	 * If not, only the user that belongs to the user will be show
-	 * 
-	 * @return mixed|bool An array of info or false
-	 */
-	public function getLastMembers()
-	{
-		try {
-			$filter = '';
-			
-			if ($_SESSION['loginType'] != 1)
-			{
-				$filter = 'WHERE m.user_id = '.$_SESSION['userId'];
-			}
-			
-			$query = 'SELECT 
-					lpad(m.member_id, 4, 0) AS member_id, 
-					m.user_id, 
-					m.name, 
-					m.last_name, 
-					m.active,
-					m.phone_one,
-					m.email_one,
-					m.date,
-					d.name AS user_name
-					FROM members m
-					LEFT JOIN user_detail d ON m.user_id = d.user_id
-					'.$filter.'
-					 ORDER BY m.member_id DESC
-					LIMIT 0, 20
-					';
+		try
+		{
+			$query = 'INSERT INTO main_gallery(name)
+	                VALUES("'.$name.'")';
 
-			return $this->db->getArray($query);
-			
-		} catch (Exception $e) {
-			return false;
+			if ($this->db->run($query))
+				return $this->db->insert_id;
 		}
-	}
-
-	public function getTotalMembers()
-	{
-		try {
-			$query = 'SELECT COUNT(*) FROM members WHERE active = 1';
-			return $this->db->getValue($query);
-		} catch (Exception $e) {
+		catch (Exception $e)
+		{
 			return false;
 		}
 	}
 	
-	/**
-	 * Get all the members 
-	 * 
-	 * With all the details
-	 * 
-	 * @return mixed|bool An array of info or false
-	 */
-	public function getAllMembers()
+	public function editSliderInfo($data)
 	{
-		try {
-			$filter = '';
-			
-			if ($_SESSION['loginType'] != 1)
-			{
-				$filter = 'WHERE m.user_id = '.$_SESSION['userId'];
-			}
-			
-			$query = 'SELECT 
-					lpad(m.member_id, 4, 0) AS member_id, 
-					m.user_id, 
-					m.name, 
-					m.last_name, 
-					m.active,
-					m.phone_one,
-					m.email_one,
-					m.date,
-					d.name AS user_name
-					FROM members m
-					LEFT JOIN user_detail d ON m.user_id = d.user_id
-					'.$filter.'
-					 ORDER BY m.member_id DESC
-					';
-			return $this->db->getArray($query);
-			
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getRecentMembers()
-	{
-		try {
-			$query = 'SELECT COUNT(*) FROM members WHERE date = CURDATE() AND user_id = '.$_SESSION['userId'];
-			return $this->db->getValue($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	/**
-	 * Get all the members
-	 *
-	 * With all the details
-	 *
-	 * @return mixed|bool An array of info or false
-	 */
-	public function getRoomsByCondo($condo_id)
-	{
-		try {	
-			$query = 'SELECT 
-				mr.member_room_id,
-				m.member_id,
-				m.name,
-				m.last_name,
-				c.condo,
-				r.room, 
-				r.condo_id,
-				(SELECT IFNULL((
-					SELECT 
-					SUM(p.amount)
-					FROM payments p
-					WHERE p.member_id = m.member_id
-					AND p.room_id = r.room_id 
-				), 0)) AS total,
-				(SELECT IFNULL((
-					SELECT 
-					SUM(p.amount)
-					FROM payments p
-					WHERE p.member_id = m.member_id
-					AND p.room_id = r.room_id 
-					AND p.status = 2
-				), 0)) AS paid,
-				(SELECT IFNULL((
-					SELECT 
-					SUM(p.amount)
-					FROM payments p
-					WHERE p.member_id = m.member_id
-					AND p.room_id = r.room_id 
-					AND p.status = 1
-				), 0)) AS pending
-				FROM member_rooms mr
-				LEFT JOIN rooms r ON r.room_id = mr.room_id
-				LEFT JOIN members m ON m.member_id = mr.member_id
-				LEFT JOIN condos c ON r.condo_id = c.condo_id
-				WHERE r.condo_id = '.$condo_id.'
-				ORDER BY m.member_id DESC
-					';
-			return $this->db->getArray($query);
-				
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function updateMemberAvatar($file, $memberId)
-	{
-		try {
-			$query = 'UPDATE members SET avatar = ? WHERE member_id = ?';
+		try
+		{
+			$query = 'UPDATE main_gallery 
+					SET title = ?, 
+					link = ?, 
+					promos = ?
+					WHERE picture_id = ?';
 			$prep = $this->db->prepare($query);
-			$prep->bind_param('si', $file, $memberId);
+			$prep->bind_param('sssi', 
+					$data['title'], 
+					$data['link'],
+					$data['promos'],
+					$data['sliderId']);
+			return $prep->execute();
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function deleteSlider($picture_id)
+	{
+		try
+		{
+			$picture_id = (int) $picture_id;
+			 
+			$query = 'DELETE FROM main_gallery WHERE picture_id = '.$picture_id;
+			 
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function updateCompanyInfo($data)
+	{
+		try
+		{
+			$companyId = (int) $data['companyId'];
+			
+			$query = 'UPDATE companies
+					SET name = ?,
+					description = ?,
+					latitude = ?,
+					longitude = ?
+					WHERE company_id = ?';
+			
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('ssddi',
+					$data['companyName'],
+					$data['companyDescription'],
+					$data['companyLatitude'],
+					$data['companyLongitude'],
+					$data['companyId']);
+			
+			return $prep->execute();
+		}
+		catch (Exception $e)
+		{
+			
+			return false;
+		}
+	}
+	
+	public function updateCompanySeo($data)
+	{
+		try
+		{
+			$companyId = (int) $data['companyId'];
+				
+			$query = 'UPDATE seo
+					SET title = ?,
+					description = ?,
+					keywords = ?
+					WHERE company_id = ?';
+				
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('sssi',
+					$data['companySeoTitle'],
+					$data['companySeoDescription'],
+					$data['companySeoKeywords'],
+					$data['companyId']);
+				
+			return $prep->execute();
+		}
+		catch (Exception $e)
+		{
+				
+			return false;
+		}
+	}
+	
+	public function updateCompanySocial($data)
+	{
+		try
+		{
+			$companyId = (int) $data['companyId'];
+	
+			$query = 'UPDATE social
+					SET tuit_url = ?,
+					facebook = ?,
+					tripadvisor = ?,
+					youtube = ?,
+					pinterest = ?,
+					instagram = ?
+					WHERE company_id = ?';
+	
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('ssssssi',
+					$data['companyTwitter'],
+					$data['companyFacebook'],
+					$data['companyTripadvisor'],
+					$data['companyYoutube'],
+					$data['companyPinterest'],
+					$data['companyInstagram'],
+					$data['companyId']);
+	
+			return $prep->execute();
+		}
+		catch (Exception $e)
+		{
+	
+			return false;
+		}
+	}
+	
+	public function updateCompanyEmail($data)
+	{
+		try {
+			$emailId = (int) $data['emailId'];
+			$query = 'UPDATE email 
+					SET e_mail = ? 
+					WHERE e_mail_id = ?';
+			
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('si', 
+					$data['emailVal'], 
+					$emailId);
 			return $prep->execute();
 		} catch (Exception $e) {
 			return false;
 		}
 	}
 	
-	public function getMemberByMemberId($memberId)
+	public function addCompanyEmail($data)
 	{
 		try {
-			$query = 'SELECT m.*
-					FROM members m
-					WHERE m.member_id = 
-					'.$memberId;
-			return $this->db->getRow($query);
+			$companyId = (int) $data['companyId'];
+			$query = 'INSERT INTO email(company_id, e_mail)
+						VALUES(?, ?)';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('is', 
+					$companyId,
+					$data['emailVal']);
+			$prep->execute();
+		} catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function updateCompanyPhone($data)
+	{
+		try {
+			$phoneId = (int) $data['phoneId'];
+			$query = 'UPDATE telephone
+					SET telephone = ?
+					WHERE telephone_id = ?';
+				
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('si',
+					$data['phoneVal'],
+					$phoneId);
+			return $prep->execute();
 		} catch (Exception $e) {
 			return false;
 		}
 	}
 	
-	public function getMemberHistoryById($memberId)
+	public function addCompanyPhone($data)
 	{
 		try {
-			$query = 'SELECT mh.* , ud.name
-					FROM member_history mh 
-					LEFT JOIN user_detail ud ON mh.user_id = ud.user_id
-					WHERE mh.member_id = '.$memberId.'
-					ORDER BY mh.history_id DESC		
+			$companyId = (int) $data['companyId'];
+			$query = 'INSERT INTO telephone(company_id, telephone)
+						VALUES(?, ?)';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('is',
+					$companyId,
+					$data['phoneVal']);
+			$prep->execute();
+		} catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function updateCompanyWebsite($data)
+	{
+		try {
+			$companyId = (int) $data['companyId'];
+			$query = 'UPDATE companies 
+					SET website = ? 
+					WHERE company_id = ?';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('si', 
+					$data['companyWebsite'],
+					$companyId);
+			return $prep->execute();
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function updateCompanyLogo($logoId, $logoName)
+	{
+		try {
+			$query = 'UPDATE company_logo 
+					SET logo = ? 
+					WHERE logo_id = ? ';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('si', 
+					$logoName,
+					$logoId);
+			return $prep->execute();
+		} catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function addCompanyLogo($companyId, $logoName)
+	{
+		try {
+			$query = 'INSERT INTO company_logo(company_id, logo)
+					VALUES(?, ?)';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('is',
+					$companyId,
+					$logoName);
+			if ($prep->execute())
+			{
+				return $prep->insert_id;
+			}
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function addCompanySlider($companyId, $name)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+			$query = 'INSERT INTO company_sliders(company_id, slider)
+	                VALUES('.$companyId.', "'.$name.'")';
+	
+			if ($this->db->run($query))
+				return $this->db->insert_id;
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function deleteCompanySlider($picture_id)
+	{
+		try
+		{
+			$picture_id = (int) $picture_id;
+	
+			$query = 'DELETE FROM company_sliders WHERE sliders_id = '.$picture_id;
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function addCompanyGallery($companyId, $name)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+			$query = 'INSERT INTO company_galeries(company_id, picture)
+	                VALUES('.$companyId.', "'.$name.'")';
+			
+			if ($this->db->run($query))
+				return $this->db->insert_id;
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function deleteCompanyGallery($picture_id)
+	{
+		try
+		{
+			$picture_id = (int) $picture_id;
+	
+			$query = 'DELETE FROM company_galeries 
+					WHERE picture_id = '.$picture_id;
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function getCompanyLocations($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'SELECT ubication 
+					FROM companies_ubication 
+					WHERE company = '.$companyId.' 
+					GROUP BY ubication';
+				
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function changeCompanyOfCategory($data)
+	{
+		try
+		{
+			$category 	= (int) $data['category'];
+			$companyId	= (int) $data['companyId'];
+	
+			$query = 'UPDATE companies SET category = '.$category.'
+					WHERE company_id = '.$companyId;
+	
+			if ($this->db->run($query))
+			{
+				$this->eraseSubcategoriesByCompany($companyId);
+			}
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function eraseSubcategoriesByCompany($companyId)
+	{
+		try
+		{
+			$query = 'DELETE FROM companies_subcategories 
+					WHERE company = '.$companyId;
+	
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function updateCompanySubcategory($data)
+	{
+		try
+		{
+			$companyId = (int) $data['companyId'];
+			$subcategory = (int) $data['subcategory'];
+	
+			$query = 'SELECT COUNT(*) FROM companies_subcategories
+					WHERE company = '.$companyId.'
+					AND subcategory = '.$subcategory;
+	
+			$c = $this->db->getValue($query);
+	
+			if ($c > 0)
+			{
+				$query = 'DELETE FROM companies_subcategories
+					WHERE company = '.$companyId.'
+					AND subcategory = '.$subcategory;
+			}
+			else
+			{
+				$query = 'INSERT INTO companies_subcategories(company, subcategory)
+						VALUES('.$companyId.', '.$subcategory.')';
+			}
+	
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function updateCompanyLocation($data)
+	{
+		try
+		{
+			$companyId = (int) $data['companyId'];
+			$location_id = (int) $data['location_id'];
+	
+			$query = 'SELECT COUNT(*) FROM companies_ubication
+					WHERE company = '.$companyId.'
+					AND ubication = '.$location_id;
+	
+			$c = $this->db->getValue($query);
+	
+			if ($c > 0)
+			{
+				$query = 'DELETE FROM companies_ubication
+					WHERE company = '.$companyId.'
+					AND ubication = '.$location_id;
+			}
+			else
+			{
+				$query = 'INSERT INTO companies_ubication(company, ubication)
+						VALUES('.$companyId.', '.$location_id.')';
+			}
+	
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function publishCompany($companyId, $todo)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+				
+			$query = 'UPDATE companies SET published = '.$todo.'
+					WHERE company_id = '.$companyId;
+				
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function closeCompany($companyId, $todo)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'UPDATE companies SET closed = '.$todo.'
+					WHERE company_id = '.$companyId;
+	
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function createCompany($companyName)
+	{
+		try
+		{
+			$companyId = 0;
+			$query = 'INSERT INTO companies(name, published) VALUES(?, 0)';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('s', $companyName);
+			
+			if ($prep->execute())
+			{
+				$companyId = $prep->insert_id;
+				
+				$query = 'INSERT INTO social(company_id) values('.$companyId.')';
+				
+				if ($this->db->run($query)) {
+					
+					$query = 'INSERT INTO seo(company_id) values('.$companyId.')';
+					if ($this->db->run($query)) {
+						
+						return $companyId;
+					}
+				}
+						
+			}
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function updateSettings($data)
+	{
+		try {
+			$query = 'UPDATE app_info SET
+					title = ?,
+					site_name = ?,
+					url = ?,
+					content = ?,
+					description = ?,
+					keywords = ?,
+					twitter = ?,
+					facebook = ?,
+					googleplus = ?,
+					pinterest = ?,
+					linkedin = ?,
+					email = ?,
+					youtube = ?,
+					instagram = ?,
+					location = ?
 					';
+			
+			$prep = $this->db->prepare($query);
+			
+			$prep->bind_param('sssssssssssssss',
+					$data['siteTittle'],
+					$data['siteName'],
+					$data['siteUrl'],
+					$data['siteContent'],
+					$data['siteDescription'],
+					$data['siteKeywords'],
+					$data['siteTwitter'],
+					$data['siteFacebook'],
+					$data['siteGoogleplus'],
+					$data['sitePinterest'],
+					$data['siteLinkedin'],
+					$data['siteEmail'],
+					$data['siteYoutube'],
+					$data['siteInstagram'],
+					$data['siteLocation']
+					);
+			
+			return $prep->execute();
+			
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function addCategory($data)
+	{
+		try {
+			$query = 'INSERT INTO categories(name) VALUES(?)';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('s', $data['categoryName']);
+			if ($prep->execute())
+			{
+				return $prep->insert_id;
+			}
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function updateCategory($data)
+	{
+		try {
+			$query = 'UPDATE categories SET 
+					name = ?, 
+					title = ?, 
+					description = ? 
+					WHERE category_id = ?';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('sssi', 
+			$data['catName'],
+			$data['catTitle'],
+			$data['catDescription'],
+			$data['catId']
+			);
+			
+			
+			return $prep->execute();
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function deleteCategory($data)
+	{
+		try {
+			$query = 'DELETE FROM subcategories 
+					WHERE category = '.$data['catId'];
+			$this->db->run($query);
+			
+			$query = 'DELETE FROM categories 
+					WHERE category_id = '.$data['catId'];
+			
+			return $this->db->run($query);
+			
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function addSubcategory($data)
+	{
+		try {
+			$query = 'INSERT 
+					INTO subcategories(category, name) 
+					VALUE(?, ?)';
+			
+			$prep = $this->db->prepare($query);
+			
+			$prep->bind_param('is', 
+					$data['catId'],
+					$data['subName']);
+			if ($prep->execute())
+				return $prep->insert_id;
+			
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function addLocation($data)
+	{
+		try {
+			$query = 'INSERT INTO locations(name) VALUES(?)';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('s', $data['locationName']);
+			if ($prep->execute())
+			{
+				return $prep->insert_id;
+			}
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function updateLocation($data)
+	{
+		try {
+			$query = 'UPDATE locations SET
+					name = ?,
+					description = ?
+					WHERE location_id = ?';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('ssi',
+					$data['locName'],
+					$data['locDescription'],
+					$data['locId']
+			);
+			return $prep->execute();
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function deleteLocation($data)
+	{
+		try {
+			$query = 'DELETE FROM locations
+					WHERE location_id = '.$data['locId'];
+				
+			return $this->db->run($query);
+				
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function load_file_from_url($url)
+	{
+		$curl = curl_init();
+	
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_REFERER, 'http://www.wheretogo.com.mx/');
+		$str = curl_exec($curl);
+		curl_close($curl);
+	
+		return $str;
+	}
+	
+	public function addVideo($video)
+	{
+		try
+		{
+			
+			$url = "http://gdata.youtube.com/feeds/api/videos/".$video;
+			
+			echo $url;
+			
+			$xml = self::load_file_from_url($url);
+				
+			if (!$xml)
+			{
+				echo "Error, no se ha podido obtener la info del video $id <br />";
+				return false;
+			}
+			else
+			{
+				preg_match("#<yt:duration seconds='([0-9]+)'/>#", $xml, $duracion);
+					
+				$xml 		= simplexml_load_string($xml);
+				$img 		= 'http://i.ytimg.com/vi/'.$video.'/mqdefault.jpg';
+				$title 		= $xml->title;
+				$content 	= $xml->content;
+				$duration 	= date('i:s',$duracion[1]);
+				$query 		= 'INSERT INTO main_videos(youtube, image, title, content, duration)
+							VALUES(?, ?, ?, ?, ?)';
+		
+				$prep 		= $this->db->prepare($query);
+				$prep->bind_param('sssss', $video, $img, $title, $content, $duration);
+
+				if ($prep->execute())
+				{
+					$data['image']  = $img;
+					$data['title']  = $title;
+					$data['id']  	= $prep->insert_id;
+					
+					return $data;
+				}
+			}
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function deleteVideo($data)
+	{
+		try
+		{
+			$video_id = (int) $data;
+			$query = 'DELETE FROM main_videos WHERE video_id = '.$video_id;
+		
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getCategoriesWithCompanies
+	 * 
+	 * Get all the categories that at least have one one company related
+	 * 
+	 * @return multitype:unknown |boolean
+	 */
+	public function getCategoriesWithCompanies()
+	{
+	    try
+	    {
+	        $query = 'SELECT cat.category_id, cat.name
+                FROM categories cat
+	        	ORDER BY cat.name ASC';
+                
+                return $this->db->getArray($query);
+	    }
+	    catch (Exception $e)
+	    {
+	        return false;
+	    }
+	}
+	
+	/**
+	 * getAllCompanies
+	 *
+	 * returns all the companies
+	 *
+	 * @param int $id this is the category id
+	 * @return multitype:unknown |boolean
+	 */
+	public function getCompanies()
+	{
+		try
+		{
+			$query = 'SELECT
+			c.name,
+			c.company_id,
+			c.promoted,
+			c.closed,
+			c.published, 
+			s.description,
+			ca.name AS category,
+			ca.category_id,
+			p.logo
+	
+			FROM companies c
+			LEFT JOIN seo s ON c.company_id = s.company_id
+			LEFT JOIN company_logo p ON c.company_id = p.company_id
+			LEFT JOIN categories ca ON ca.category_id = c.category
+	
+			GROUP BY c.company_id
+			ORDER BY c.company_id DESC';
+	
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function getEvents()
+	{
+		try {
+			$query = 'SELECT company_id, name FROM companies WHERE event = 1 AND belong_company IS NULL ORDER BY name';
 			return $this->db->getArray($query);
 		} catch (Exception $e) {
 			return false;
 		}
 	}
 	
-	public function addHistory($data)
+	/**
+	 * getAllCompanies
+	 *
+	 * returns all the companies
+	 *
+	 * @param int $id this is the category id
+	 * @return multitype:unknown |boolean
+	 */
+	public function getTotalCompanies()
 	{
-	    try
-	    {
-	    	$query = 'INSERT INTO member_history(user_id, member_id, date, time, history) 
-	    			VALUES('.$_SESSION["userId"].', ?, CURDATE(), CURTIME(), ?)';
-			
-	        $prep = $this->db->prepare($query);
-
-	        $prep->bind_param('is', 
-	        		$data['memberId'],
-	        		$data['historyEntry']);
-			
-             return $prep->execute();
-	    }
-	    catch (Exception $e)
-	    {
-	    	echo $e->getMessage();
-	    }
+		try
+		{
+			$query = 'SELECT COUNT(*)
+			FROM companies c
+			LEFT JOIN seo s ON c.company_id = s.company_id
+			LEFT JOIN company_logo p ON c.company_id = p.company_id
+			LEFT JOIN categories ca ON ca.category_id = c.category';
+	
+			return $this->db->getValue($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
 	}
 	
-	public function getHistoryEntries($member_id)
+	/**
+	 * getCompaniesByCategoryId
+	 *
+	 * returns all the companies that belongs to a given category
+	 *
+	 * @param int $id this is the category id
+	 * @return multitype:unknown |boolean
+	 */
+	public function getCompaniesByCategoryId($categoryId)
 	{
-		try 
+		$categoryId = (int) $categoryId;
+	
+		try
 		{
-			$member_id = (int) $member_id;
-			$query = 'SELECT h.*, ud.name
-					FROM member_history h
-					LEFT JOIN user_detail ud ON ud.user_id = h.user_id
-					WHERE h.member_id = '.$member_id.'
-					ORDER BY h.history_id DESC';
+			$query = 'SELECT
+			c.name,
+			c.company_id,
+			c.promoted,
+			c.closed,
+			c.published,
+			s.description,
+			ca.name AS category,
+			ca.category_id,
+			p.logo
+	
+			FROM companies c
+			LEFT JOIN seo s ON c.company_id = s.company_id
+			LEFT JOIN company_logo p ON c.company_id = p.company_id
+			LEFT JOIN categories ca ON ca.category_id = c.category
+	
+			WHERE c.category = '.$categoryId.'
+			GROUP BY c.company_id
+			ORDER BY c.company_id DESC';
+	
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getVideos
+	 * 
+	 * return only n videos from main_videos
+	 * @param int limit, n videos for return
+	 * @return multitype:unknown |boolean
+	 */
+	public function getVideos($limit = '')
+	{
+		try
+		{
+			$query = 'SELECT *
+	        		FROM main_videos
+	        		ORDER BY video_id DESC';
+			
+			if ($limit > 0) {
+				$query .= ' LIMIT '.$limit;
+			}
+	
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getLocations
+	 * 
+	 * get all the location that at least are related to any company
+	 * 
+	 * @return multitype:unknown |boolean
+	 */
+	public function getLocations()
+	{
+		try
+		{
+			$query = 'SELECT l.*
+					FROM locations l';
 			
 			return $this->db->getArray($query);
 		}
 		catch (Exception $e)
 		{
-			return false;			
-		}
-	}
-	
-	public function addMemberTask($data)
-	{
-		$date = Tools::formatToMYSQL($data['task_date']);
-	
-		$time = $data['task_hour'].':00';
-		$member_id = (int) $data['memberId'];
-		try {
-			$query = 'INSERT INTO member_tasks(task_to, task_from, date, created_on, time, content, member_id)
-					VALUES(?, ?, ?, CURDATE(), ?, ?, ?)';
-			$prep = $this->db->prepare($query);
-				
-			$prep->bind_param('iisssi',
-					$data['task_to'],
-					$_SESSION['userId'],
-					$date,
-					$time,
-					$data['task_content'],
-					$member_id);
-			// 			Pretty good piece of code!
-			// 			if(!$prep->execute())
-				// 			{
-				// 				printf("Errormessage: %s\n", $prep->error);
-				// 			}
-				return $prep->execute();
-		} catch (Exception $e) {
-			echo $e->getMessage();
-			return false;
-		}
-	}
-	
-	public function getMemberTaskByMemberId($member_id)
-	{
-		try {
-			$member_id = (int) $member_id;
-			
-			$query = 'SELECT t.*,
-					ud.name AS assigned_by,
-					uds.name AS assigned_to
-					FROM member_tasks t
-					LEFT JOIN user_detail ud ON ud.user_id = t.task_from
-					LEFT JOIN user_detail uds ON uds.user_id = t.task_to
-					WHERE t.member_id = '.$member_id.'
-					ORDER BY t.date ASC
-					';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getAllMemberTasks()
-	{
-		try {
-			$member_id = (int) $member_id;
-			
-			$query = 'SELECT t.*,
-					ud.name AS assigned_by,
-					uds.name AS assigned_to,
-					m.name, m.last_name
-					FROM member_tasks t
-					LEFT JOIN user_detail ud ON ud.user_id = t.task_from
-					LEFT JOIN user_detail uds ON uds.user_id = t.task_to
-					LEFT JOIN members m ON m.member_id = t.member_id
-					WHERE t.status = 0
-					ORDER BY t.date DESC
-					';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getAllTasksByUser()
-	{
-		try {
-			$member_id = (int) $member_id;
-	
-			$query = 'SELECT t.*,
-					ud.name AS assigned_by,
-					uds.name AS assigned_to,
-					m.name, m.last_name
-					FROM member_tasks t
-					LEFT JOIN user_detail ud ON ud.user_id = t.task_from
-					LEFT JOIN user_detail uds ON uds.user_id = t.task_to
-					LEFT JOIN members m ON m.member_id = t.member_id
-					WHERE t.assigned_to = '.$_SESSION['userId'].'
-					AND t.status = 0
-					ORDER BY t.date DESC
-					';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getTotalTodayTasksByMemberId()
-	{
-		try {
-			$query = 'SELECT COUNT(*) 
-					FROM member_tasks 
-					WHERE date = CURDATE() 
-					AND task_to = '.$_SESSION['userId'].'
-					AND status = 0';
-			return $this->db->getValue($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getTodayTasksByUser()
-	{
-		try {
-			$query = 'SELECT t.*,
-					ud.name AS assigned_by,
-					uds.name AS assigned_to,
-					m.name, m.last_name
-					FROM member_tasks t
-					LEFT JOIN user_detail ud ON ud.user_id = t.task_from
-					LEFT JOIN user_detail uds ON uds.user_id = t.task_to
-					LEFT JOIN members m ON m.member_id = t.member_id
-					WHERE t.date = CURDATE() 
-					AND t.task_to = '.$_SESSION['userId'].'
-					AND t.status = 0
-					ORDER BY t.date DESC
-					';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getTotalPendingTasksByMemberId()
-	{
-		try {
-			$query = 'SELECT COUNT(*) 
-					FROM member_tasks 
-					WHERE date < CURDATE()
-					AND task_to = '.$_SESSION['userId'].'
-					AND status = 0';
-			return $this->db->getValue($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getPendingTasksByUser()
-	{
-		try {
-			$query = 'SELECT t.*,
-					ud.name AS assigned_by,
-					uds.name AS assigned_to,
-					m.name, m.last_name
-					FROM member_tasks t
-					LEFT JOIN user_detail ud ON ud.user_id = t.task_from
-					LEFT JOIN user_detail uds ON uds.user_id = t.task_to
-					LEFT JOIN members m ON m.member_id = t.member_id
-					WHERE t.date < CURDATE()
-					AND t.task_to = '.$_SESSION['userId'].'
-					AND t.status = 0
-					ORDER BY t.date DESC
-					';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getTotalFutureTasksByMemberId()
-	{
-		try {
-			$query = 'SELECT COUNT(*)
-					FROM member_tasks
-					WHERE date > CURDATE()
-					AND task_to = '.$_SESSION['userId'].'
-					AND status = 0';
-			return $this->db->getValue($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getFutureTasksByUser()
-	{
-		try {
-			$query = 'SELECT t.*,
-					ud.name AS assigned_by,
-					uds.name AS assigned_to,
-					m.name, m.last_name
-					FROM member_tasks t
-					LEFT JOIN user_detail ud ON ud.user_id = t.task_from
-					LEFT JOIN user_detail uds ON uds.user_id = t.task_to
-					LEFT JOIN members m ON m.member_id = t.member_id
-					WHERE t.date > CURDATE()
-					AND t.task_to = '.$_SESSION['userId'].'
-					AND t.status = 0
-					ORDER BY t.date DESC
-					';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getCompletedTasksByUser()
-	{
-		try {
-			$query = 'SELECT t.*,
-					ud.name AS assigned_by,
-					uds.name AS assigned_to,
-					m.name, m.last_name
-					FROM member_tasks t
-					LEFT JOIN user_detail ud ON ud.user_id = t.task_from
-					LEFT JOIN user_detail uds ON uds.user_id = t.task_to
-					LEFT JOIN members m ON m.member_id = t.member_id
-					WHERE t.task_to = '.$_SESSION['userId'].'
-					AND t.status = 1
-					ORDER BY t.date DESC
-					';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function completeTask($task_id)
-	{
-		try {
-			$task_id = (int) $task_id;
-			$query = 'UPDATE member_tasks SET status = 1, completed_by = '.$_SESSION['userId'].', completed_date = CURDATE()
-					WHERE task_id = '.$task_id;
-			return $this->db->run($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function addInventory($data)
-	{
-		try {
-			$query 	= 'INSERT INTO inventory(category_id, inventory, description) VALUES(?, ?, ?)';
-			$prep 	= $this->db->prepare($query);
-	
-			$prep->bind_param('iss', $data['categoryId'], $data['inventoryName'], $data['inventoryDescription']);
-	
-			if ($prep->execute())
-			{
-				return $prep->insert_id;
-			}
-			else
-			{
-				printf("Errormessage: %s\n", $prep->error);
-			}
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function deleteInventory($inventoryId)
-	{
-		try {
-			$inventoryId = (int) $inventoryId;
-			$query = 'DELETE FROM inventory WHERE inventory_id = '.$inventoryId;
-			return $this->db->run($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function updateInventoryCategory($data)
-	{
-		try {
-			$query = 'UPDATE inventory_categories SET category = ?, description = ? WHERE category_id = '.$data['categoryId'];
-			$prep = $this->db->prepare($query);
-			$prep->bind_param('ss', $data['categoryName'], $data['categoryDescription']);
-			return $prep->execute();
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getAllInventoryCategories()
-	{
-		try {
-			$query = 'SELECT * FROM inventory_categories ORDER BY category_id DESC';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function addInventoryCategories($data)
-	{
-		try {
-			$query = 'INSERT INTO inventory_categories(category, description) VALUES(?, ?)';
-			$prep = $this->db->prepare($query);
-			
-			$prep->bind_param('ss', $data['categoryName'], $data['categoryDescription']);
-			
-			if ($prep->execute())
-			{
-				return $prep->insert_id;
-			}
-			else 
-			{
-				printf("Errormessage: %s\n", $prep->error);
-			}
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function deleteCategory($categoryId)
-	{
-		try {
-			$categoryId = (int) $categoryId;
-			
-			$query = 'DELETE FROM inventory_categories WHERE category_id = '.$categoryId;
-			return $this->db->run($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getInVentoryCategoryById($id)
-	{
-		try {
-			$query = 'SELECT * FROM inventory_categories WHERE category_id = '.$id;
-			return $this->db->getRow($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getInventoryByCategory($id)
-	{
-		try {
-			$id = (int) $id;
-			$query = 'SELECT * FROM inventory WHERE category_id = '.$id;
-			
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function addRoom($data)
-	{
-		try {
-			$query = 'INSERT INTO rooms(room_type_id, room, description, condo_id) VALUES(?, ?, ?, ?)';
-			$prep = $this->db->prepare($query);
-			$prep->bind_param('issi', $data['roomType'], $data['roomName'], $data['roomDescription'], $data['condoId']);
-			if ($prep->execute())
-			{
-				return $prep->insert_id;
-			}
-			else
-			{
-				printf("Errormessage: %s\n", $prep->error);
-			}
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function deleteRoom($roomId)
-	{
-		try {
-			$roomId = (int) $roomId;
-			$query = 'DELETE FROM rooms WHERE room_id = '.$roomId;
-			
-			return $this->db->run($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function updateRoom($data)
-	{
-		try {
-			$query = 'UPDATE rooms SET room_type_id = ?, room = ?, description = ?, condo_id = ? WHERE room_id = ?';
-			$prep = $this->db->prepare($query);
-			$prep->bind_param('issii',$data['roomType'], $data['roomName'], $data['roomDescription'], $data['condoId'], $data['roomId']);
-				
-			if ($prep->execute())
-			{
-				return true;
-			}
-			else
-			{
-				printf("Errormessage: %s\n", $prep->error);
-			}
-		} catch (Exception $e) {
 			return false;
 		}
 	}
 	
 	/**
-	 * getAllRooms
-	 *
-	 * Returns the collection of rooms on table rooms
-	 * it works for the section 'Rooms'
-	 *
-	 * @return multitype:unknown |boolean
+	 * Get The last 20 logos from company_logo, check if the file exists
+	 * if the logo exists then return it, if it doesnt then test if the
+	 * next item on the array exists, until it exists .... bliiin!
 	 */
 	
-	public function getAllRooms()
+	public function getRandomBlur()
 	{
 		try {
-			$query = 'SELECT r.*, rt.room_type, rt.abbr, c.condo
-					FROM rooms r
-					LEFT JOIN room_types rt ON rt.room_type_id = r.room_type_id
-					LEFT JOIN condos c ON c.condo_id = r.condo_id
-					ORDER BY r.room_id DESC
-					';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	/**
-	 * getSingleRoomById
-	 *
-	 * Return the info a single room by a given room id
-	 *
-	 * @return multitype:unknown |boolean
-	 */
-	
-	public function getRoomById($roomId)
-	{
-		try {
-			$roomId = (int) $roomId;
-			$query = 'SELECT
-					r.*,
-					rt.room_type,
-					rt.abbr
-					FROM rooms r
-					LEFT JOIN room_types rt ON rt.room_type_id = r.room_type_id
-					WHERE r.room_id = '.$roomId.'
-					';
-			return $this->db->getRow($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getLastInventoryList()
-	{
-		try {
-			$query = 'SELECT category_id FROM inventory_categories ORDER BY category_id DESC LIMIT 1';
-			$last =  $this->db->getValue($query);
-			
-			$query = 'SELECT * FROM inventory WHERE category_id = '.$last;
-			return $this->db->getArray($query);
-			
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getInvetoryByCategory($category)
-	{
-		try {
-			$query = 'SELECT * FROM inventory WHERE category_id = '.$category;
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function addRoomInventory($data)
-	{
-		try {
-			$query = 'INSERT INTO rooms_inventory(room_id, category_id, inventory_id) VALUES(?, ?, ?)';
-			
-			$prep = $this->db->prepare($query);
-			
-			$prep->bind_param('iii',$data['roomId'], $data['categoryId'], $data['inventoryId']);
+			$src = './img-up/companies_pictures/logo/';
+			$query = 'SELECT logo
+					FROM company_logo
+					ORDER BY logo_id
+					DESC LIMIT 20';
 				
-			if ($prep->execute())
-			{
-				return true;
+			$logos = $this->db->getArray($query);
+				
+			shuffle($logos);
+	
+			for ($i = 0; $i <= sizeof($logos); $i++) {
+				if (file_exists($src.$logos[$i]['logo'])) {
+					return $logos[$i]['logo'];
+					exit;
+				}
 			}
-			else
-			{
-				printf("Errormessage: %s\n", $prep->error);
-			}
-		} catch (Exception $e) {
-			return false;
 		}
-	}
-	
-	public function getRoomInventoryByRoom($roomId)
-	{
-		try {
-			$query = 'SELECT ic.category, i.inventory
-					FROM rooms_inventory ri
-					LEFT JOIN inventory_categories ic ON ic.category_id = ri.category_id
-					LEFT JOIN inventory i ON i.inventory_id = ri.inventory_id 
-					WHERE ri.room_id = '.$roomId;
-			
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function addMemberRoom($data)
-	{
-		try {
-			$query = 'INSERT INTO member_rooms(member_id, room_id) VALUES(?, ?)';
-			$prep = $this->db->prepare($query);
-			$prep->bind_param('ii', $data['memberId'], $data['roomId']);
-			return $prep->execute();
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function deleteMemberRoom($data)
-	{
-		try {
-			$query = 'DELETE FROM member_rooms WHERE member_id = '.$data['memberId'].' AND room_id = '.$data['roomId'];
-			return $this->db->run($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getRoomsByMember($memberId)
-	{
-		try {
-			$query = 'SELECT r.room_id, r.room, r.description, rt.room_type, c.condo
-					FROM member_rooms mr
-					LEFT JOIN rooms r ON r.room_id = mr.room_id
-					LEFT JOIN condos c ON c.condo_id = r.condo_id
-					LEFT JOIN room_types rt ON rt.room_type_id = r.room_type_id
-					WHERE mr.member_id = '.$memberId;
-			
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getCategoriesInventoryByRoom($roomId)
-	{
-		try {
-			$query = 'SELECT ri.category_id, ic.category 
-				FROM rooms_inventory ri 
-				LEFT JOIN inventory_categories ic ON ic.category_id = ri.category_id
-				WHERE ri.room_id = '.$roomId.'
-				GROUP BY ri.category_id';
-			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getInventoryByCategoryRoom($roomId, $categoryId)
-	{
-		try {
-			$query = 'SELECT ri.inventory_id, i.inventory 
-				FROM rooms_inventory ri 
-				LEFT JOIN inventory i ON i.inventory_id = ri.inventory_id
-				WHERE ri.room_id = '.$roomId.' AND ri.category_id = '.$categoryId;
-			return $this->db->getArray($query);
-			
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function addPayment($data)
-	{
-		try {
-			$query = 'INSERT INTO payments(
-					user_id, 
-					member_id, 
-					room_id, 
-					category_id, 
-					inventory_id, 
-					due_date, 
-					time, 
-					amount, 
-					description)
-					VALUES('.$_SESSION['userId'].', ?, ?, ?, ?, ?, CURTIME(), ?, ?)';
-			
-			$prep = $this->db->prepare($query);
-			
-			$prep->bind_param('iiiisds', 
-					$data['memberId'],
-					$data['currentRoom'],
-					$data['currentCategory'],
-					$data['currentInventory'],
-					Tools::formatToMYSQL($data['paymentDate']),
-					$data['paymentAmount'],
-					$data['paymentDescription']
-			);
-			
-			return $prep->execute();
-
-			// 			Pretty good piece of code!
-// 						if(!$prep->execute())
-// 						{
-// 							printf("Errormessage: %s\n", $prep->error);
-// 						}
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getPaymentsByRoom($data)
-	{
-		$conditional = "";
-		
-		switch ($_POST['statusP'])
+		catch (Exception $e)
 		{
-			case "pending":
-				$conditional = ' AND status = 1 ';
-			break;
-			
-			case "past":
-				$conditional = ' AND status = 1 AND p.due_date < CURDATE() ';
-			break;
-			
-			case "paid":
-				$conditional = ' AND status = 2 ';
-			break;
-			
-			case "cancel":
-				$conditional = ' AND status = 3 ';
-			break;
+			return false;
 		}
-		
+	}
+	
+	/**
+	 * getMainPromotedCompanies
+	 * 
+	 * return the info for the main_promoted companies, there must to be four
+	 * 
+	 * @return multitype:unknown |boolean
+	 */
+	public function getMainPromotedCompanies()
+	{
 		try {
 			$query = 'SELECT 
-					p.payment_id, 
-					p.amount, 
-					p.due_date, 
-					p.status,
-					p.description,
-					DATEDIFF(p.due_date, CURDATE()) AS days, 
-					ic.category, 
-					i.inventory  
-					FROM payments p
-					LEFT JOIN inventory_categories ic ON ic.category_id = p.category_id
-					LEFT JOIN inventory i ON i.inventory_id = p.inventory_id
-					WHERE p.member_id = '.$data['memberId'].'
-					AND p.room_id = '.$data['currentRoom'].'
-					'.$conditional.'
-					ORDER BY p.due_date ASC		
-					';
+					c.company_id, 
+					c.name, 
+					c.published,
+					s.description, 
+					cat.name as category,
+					cat.category_id, 
+					cl.logo 
+					FROM companies c 
+					LEFT JOIN seo s ON s.company_id = c.company_id 
+					LEFT JOIN categories cat ON c.category = cat.category_id 
+					LEFT JOIN company_logo cl ON cl.company_id = c.company_id
+					WHERE c.main_promoted = 1';
 			return $this->db->getArray($query);
 		} catch (Exception $e) {
 			return false;
 		}
 	}
 	
-	public function calculatePayments($data)
-	{
-		try {
-			$query = 'SELECT IFNULL((
-					SELECT 
-					SUM(p.amount)
-					FROM payments p
-					WHERE p.member_id = '.$data['memberId'].'
-					AND p.room_id = '.$data['currentRoom'].' 
-					AND status != 3
-				), 0) AS total,
-				IFNULL((	
-					SELECT 
-					SUM(p.amount)
-					FROM payments p
-					WHERE p.member_id = '.$data['memberId'].'
-					AND p.room_id = '.$data['currentRoom'].'
-					AND p.status = 2
-				), 0) AS paid,
-				IFNULL(
-				(	
-					SELECT 
-					SUM(p.amount)
-					FROM payments p
-					WHERE p.member_id = '.$data['memberId'].'
-					AND p.room_id = '.$data['currentRoom'].'
-					AND p.status = 1
-				), 0) AS pending;';
-			
-			return $this->db->getRow($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getPaymentsByPaymentId($data)
+	/**
+	 * getMainPromotedCompanies
+	 *
+	 * return the info for the main_promoted companies, there must to be four
+	 *
+	 * @return multitype:unknown |boolean
+	 */
+	public function getTotalMainPromotedCompanies()
 	{
 		try {
 			$query = 'SELECT
-					p.payment_id,
-					p.amount,
-					p.due_date,
-					p.time,
-					p.description,
-					p.status,
-					DATEDIFF(p.due_date, CURDATE()) AS days,
-					ic.category,
-					i.inventory
-					FROM payments p
-					LEFT JOIN inventory_categories ic ON ic.category_id = p.category_id
-					LEFT JOIN inventory i ON i.inventory_id = p.inventory_id
-					WHERE p.payment_id = '.$data['paymentId'].'
+					COUNT(*)
+					FROM companies c
+					LEFT JOIN seo s ON s.company_id = c.company_id
+					LEFT JOIN categories cat ON c.category = cat.category_id
+					LEFT JOIN company_logo cl ON cl.company_id = c.company_id
+					WHERE c.main_promoted = 1';
+			return $this->db->getValue($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	/**
+	 * getMainPromotedCompanies
+	 *
+	 * return the info for the main_promoted companies, there must to be four
+	 *
+	 * @return multitype:unknown |boolean
+	 */
+	public function getMainUnpublishedCompanies()
+	{
+		try {
+			$query = 'SELECT
+					c.company_id,
+					c.name,
+					c.published,
+					s.description,
+					cat.name as category,
+					cat.category_id,
+					cl.logo
+					FROM companies c
+					LEFT JOIN seo s ON s.company_id = c.company_id
+					LEFT JOIN categories cat ON c.category = cat.category_id
+					LEFT JOIN company_logo cl ON cl.company_id = c.company_id
+					WHERE c.published = 0
+					ORDER BY c.company_id DESC
 					';
-// 			echo $query;
+			return $this->db->getArray($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	/**
+	 * getMainPromotedCompanies
+	 *
+	 * return the info for the main_promoted companies, there must to be four
+	 *
+	 * @return multitype:unknown |boolean
+	 */
+	public function getTotalNotPublisedCompanies()
+	{
+		try {
+			$query = 'SELECT
+					COUNT(*)
+					FROM companies c
+					WHERE c.published = 0';
+			return $this->db->getValue($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	/**
+	 * getCategoryInfoById
+	 * 
+	 * return the info form the category by a given category_id
+	 * 
+	 * @param int $category it's the category id, got from the get param
+	 * @return array|boolean returns an array with the category info
+	 */
+	public function getCategoryInfoById($category)
+	{
+		try
+		{
+			$category = (int) $category;
+			$query = 'SELECT * 
+					FROM categories
+			        WHERE category_id = '.$category;
 			return $this->db->getRow($query);
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			return false;
 		}
 	}
 	
-	public function setPaymentStatus($paymentId, $status)
+	/**
+	 * getSubcategoriesByCategoryId
+	 * 
+	 * returns the subcategories that belongs to an specific category Id and that 
+	 * hast at least one company related
+	 * 
+	 * @param int $category
+	 * @return array |boolean array on success, false otherwise
+	 */
+	public function getSubcategoriesByCategoryId($category)
 	{
-		try {
-			$paymentId = (int) $paymentId;
-			$status = (int) $status;
-			$query = 'UPDATE payments SET status = '.$status.' WHERE payment_id = '.$paymentId;
-			return $this->db->run($query);
-		} catch (Exception $e) {
+		$category = (int) $category;
+		try
+		{
+			$category = (int) $category;
+			$query = 'SELECT s.name, s.subcategory_id
+				FROM subcategories s
+				WHERE category = '.$category.'
+				ORDER BY s.name ASC';
+	
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
 			return false;
 		}
 	}
 	
-	public function addRoomTypes($data)
+	public function belongSubcategories($companyId)
 	{
 		try {
-			$query = 'INSERT INTO room_types(room_type, description) VALUES(?, ?)';
-			$prep = $this->db->prepare($query);
+			$companyId = (int) $companyId;
+	    
+	        $query = 'SELECT subcategory 
+	        		FROM companies_subcategories 
+	        		WHERE company = '.$companyId;
 			
-			$prep->bind_param('ss', $data['roomTypeName'], $data['roomTypeDescription']);
-			
-			if ($prep->execute())
-			{
-				return $prep->insert_id;
-			}
-			else
-			{
-				printf("Errormessage: %s\n", $prep->error);
-			}
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function deleteType($typeId)
-	{
-		try {
-			$typeId = (int) $typeId;
-			$query = 'DELETE FROM room_types WHERE room_type_id = '.$typeId;
-			return $this->db->run($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getRoomTypes()
-	{
-		try {
-			$query = 'SELECT * FROM room_types';
 			return $this->db->getArray($query);
 		} catch (Exception $e) {
 			return false;
 		}
 	}
 	
-	public function addCondos($data)
+	/**
+	 * getSubcategoryInfoById
+	 *
+	 * return the info form the category by a given subcategory_id
+	 *
+	 * @param int $category it's the category id, got from the get param
+	 * @return array|boolean returns an array with the subcategory info
+	 */
+	public function getSubcategoryInfoById($subcategory)
 	{
-		try {
-			$query = 'INSERT INTO condos(condo, description) VALUES(?, ?)';
-			$prep=$this->db->prepare($query);
-			
-			$prep->bind_param('ss', $data['condoName'], $data['condoDescription']);
-			
-			if ($prep->execute())
-			{
-				return $prep->insert_id;
-			}
-			else
-			{
-				printf("Errormessage: %s\n", $prep->error);
-			}
-		} catch (Exception $e) {
+		$subcategory = (int) $subcategory;
+		try
+		{
+			$category = (int) $category;
+			$query = 'SELECT *
+					FROM subcategories
+			        WHERE subcategory_id = '.$subcategory;
+			return $this->db->getRow($query);
+		}
+		catch (Exception $e)
+		{
 			return false;
 		}
 	}
 	
-	public function deleteCondo($condoId)
+	/**
+	 * getCompaniesBySubcategotyId
+	 * 
+	 * retturns an array of the companies that belongs to a give subcategory
+	 * 
+	 * @param int $subcategoryId
+	 * @return multitype:unknown |boolean
+	 */
+	public function getCompaniesBySubcategotyId($subcategoryId)
 	{
-		try {
-			$condoId = (int) $condoId;
-			$query = 'DELETE FROM condos WHERE condo_id = '.$condoId;
-			return $this->db->run($query);
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getAllCondos()
-	{
-		try {
-			$query = 'SELECT * FROM condos ORDER BY condo_id DESC';
+		$subcategoryId = (int) $subcategoryId;
+		
+		try
+		{
+			$query = '
+			SELECT 
+			c.name,
+			c.company_id, 
+			c.promoted,
+			c.closed,
+			s.description,
+			ca.name AS category,
+			ca.category_id, 
+			p.logo
+		
+			FROM companies c
+			LEFT JOIN seo s ON c.company_id = s.company_id
+			LEFT JOIN companies_subcategories cs ON cs.company = c.company_id
+			LEFT JOIN company_logo p ON c.company_id = p.company_id
+			LEFT JOIN categories ca ON ca.category_id = c.category
+		
+			WHERE cs.subcategory = '.$subcategoryId.'
+			AND c.published = 1
+			GROUP BY c.company_id
+			ORDER BY c.promoted AND c.company_id DESC';
+				
 			return $this->db->getArray($query);
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			return false;
 		}
 	}
 	
-	public function getMessagesByMember($member_id)
+	/**
+	 * getCompaniesByLocation
+	 * 
+	 * get all the companies that belongs to an specific location
+	 * 
+	 * @param int $id
+	 * @return multitype:unknown |boolean
+	 */
+	public function getCompaniesByLocation($id)
 	{
-		try {
-			$query = 'SELECT m.message_id,
-					m.user_id,
-					m.from_user,
-					m.to_user,
-					DATE_FORMAT(m.date, "%e %b %l:%i %p") as date,
-					m.message,
-					m.status,
-					ud.name AS user_name,
-					CONCAT(me.name, " ", me.last_name ) AS member_name,
-					me.avatar
-					FROM messages m
-					LEFT JOIN user_detail ud ON ud.user_id = m.user_id
-					LEFT JOIN members me ON me.member_id = m.member_id
-					WHERE m.member_id = '.$member_id.'
-					ORDER BY m.message_id ASC
-					';
-			
+		$id = (int) $id;
+		
+		try
+		{
+			$query = 'SELECT
+			c.name,
+			c.company_id, 
+			c.promoted,
+			c.closed,
+			s.description,
+			ca.name AS category,
+			ca.category_id, 
+			p.logo,
+			l.name as location_name
+		
+			FROM companies c
+			LEFT JOIN seo s ON c.company_id = s.company_id
+			LEFT JOIN companies_ubication cu ON c.company_id = cu.company
+			LEFT JOIN company_logo p ON c.company_id = p.company_id
+			LEFT JOIN categories ca ON ca.category_id = c.category
+			LEFT JOIN locations l ON cu.ubication = l.location_id
+		
+			WHERE cu.ubication = '.$id.'
+			GROUP BY c.company_id DESC';
+				
 			return $this->db->getArray($query);
-		} catch (Exception $e) {
-			return false;			
+		}
+		catch (Exception $e)
+		{
+			return false;
 		}
 	}
 	
-	public function getMessageByMessageId($message_id)
+	/**
+	 * getLocationInfoById
+	 * 
+	 * get the info of a location by a given location_id
+	 * 
+	 * @param int $id
+	 * @return multitype:|boolean
+	 */
+	public function getLocationInfoById($id)
 	{
-		try {
-			$query = 'SELECT m.message_id,
-					m.user_id,
-					m.from_user,
-					m.to_user,
-					DATE_FORMAT(m.date, "%e %b %l:%i %p") as date,
-					m.message,
-					m.status,
-					ud.name AS user_name,
-					CONCAT(me.name, " ", me.last_name ) AS member_name
-					FROM messages m
-					LEFT JOIN user_detail ud ON ud.user_id = m.user_id
-					LEFT JOIN members me ON me.member_id = m.member_id
-					WHERE m.message_id = '.$message_id.'
-					ORDER BY m.message_id ASC
-					';
+		try
+		{
+			$id = (int) $id;
+			
+			$query = 'SELECT *
+					FROM locations
+					WHERE location_id = '.$id;
 				
 			return $this->db->getRow($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getCompanyLogo
+	 * 
+	 * get the logo of a given company
+	 * 
+	 * @param int $companyId
+	 * @return boolean
+	 */
+	public function getCompanyLogo($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'SELECT logo_id, logo
+					FROM company_logo
+					WHERE company_id = '.$companyId;
+
+			return $this->db->getRow($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getCompanySeoInfo
+	 * 
+	 * returns the seo and social column according to a companyId
+	 * 
+	 * @param unknown $companyId
+	 * @return multitype:|boolean
+	 */
+	public function getCompanySeoInfo($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'SELECT *
+	        		FROM seo s
+	        		LEFT JOIN social so ON so.company_id = s.company_id
+	        		WHERE s.company_id = '.strip_tags($companyId);
+			 
+			return  $this->db->getRow($query);
+				
+		}
+		catch (Exception $e)
+		{
+			return  false;
+		}
+	}
+	
+	/**
+	 * companyInfo
+	 * 
+	 * get's the company info ... meh
+	 * 
+	 * @param int $companyId
+	 * @return multitype:|boolean
+	 */
+	public function companyInfo($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+				
+			$query = 'SELECT C.*, 
+					S.seo_id, S.title, S.description AS seo_description, S.keywords,
+					SOC.social_id, SOC.tuit_url, SOC.tripadvisor, 
+					cat.name as category_name
+					FROM companies AS C
+					LEFT JOIN seo S ON S.company_id = C.company_id
+					LEFT JOIN social SOC ON SOC.company_id = C.company_id
+					LEFT JOIN categories cat ON cat.category_id = C.category
+					WHERE C.company_id =
+					'.$companyId;
+				
+			return $this->db->getRow($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * this gets the last slider linked to a company
+	 * @param int $companyId
+	 * @return boolean
+	 */
+	public function getLastSlider($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+				
+			$query = 'SELECT slider
+					FROM company_sliders
+					WHERE company_id = '.$companyId.'
+					ORDER BY sliders_id
+					DESC LIMIT 1';
+				
+			return $this->db->getValue($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getCompanySlider
+	 * 
+	 * gets the sliders linked to a company
+	 * 
+	 * @param unknown $companyId
+	 * @return multitype:unknown |boolean
+	 */
+	public function getCompanySliders($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'SELECT sliders_id, slider
+					FROM company_sliders
+					WHERE company_id = '.$companyId.' 
+					ORDER BY sliders_id DESC';
+	
+			return $this->db->getArray($query);
+	
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getCompanyGaleries
+	 * 
+	 * the photos related to a company
+	 * 
+	 * @param unknown $companyId
+	 * @return multitype:unknown |boolean
+	 */
+	public function getCompanyGaleries($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'SELECT picture_id, picture
+					FROM company_galeries
+					WHERE company_id = '.$companyId.'
+					ORDER BY picture_id DESC';
+	
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getCompanySocialInfo
+	 * 
+	 * the social thing
+	 * 
+	 * @param unknown $companyId
+	 * @return multitype:|boolean
+	 */
+	public function getCompanySocialInfo($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'SELECT * FROM social WHERE company_id='.strip_tags($companyId);
+			return $this->db->getRow($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getEmails
+	 * 
+	 * emails related to a company
+	 * 
+	 * @param unknown $companyId
+	 * @return multitype:unknown |boolean
+	 */
+	public function getEmails($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'SELECT e_mail, e_mail_id
+					FROM email WHERE company_id = '.$companyId;
+				
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+		#	        echo $e->getMessage();
+			return false;
+		}
+	}
+	
+	/**
+	 * getPhones
+	 * 
+	 * get the phones related to a company
+	 * 
+	 * @param unknown $companyId
+	 * @return multitype:unknown |boolean
+	 */
+	public function getPhones($companyId)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'SELECT telephone, telephone_id
+					FROM telephone WHERE company_id = '.$companyId;
+				
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getCompaniesWithLocation
+	 * 
+	 * Returns an array of companies with location, not null, numeric, != 0
+	 * 
+	 * @return multitype:unknown |boolean
+	 */
+	public function getCompaniesWithLocation()
+	{
+		try
+		{
+			$query = 'SELECT C.*, 
+					S.title, S.description AS seo_description,
+					cat.name as category_name,
+					p.logo
+					FROM companies AS C
+					LEFT JOIN seo S ON S.company_id = C.company_id
+					LEFT JOIN categories cat ON cat.category_id = C.category
+					LEFT JOIN company_logo p ON C.company_id = p.company_id
+					WHERE (C.longitude IS NOT NULL AND C.longitude != 0) AND
+					(C.latitude IS NOT NULL AND C.latitude != 0)';
+				
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * getResultsAll
+	 * 
+	 * search a term
+	 * 
+	 * @param unknown $term
+	 * @param unknown $from
+	 * @param unknown $to
+	 * @return boolean
+	 */
+	public function searchTerm($term, $from, $to)
+	{
+		try
+		{
+			$term 	= str_replace('-', ' ', $term);
+			$from 	= (int) $from;
+			$to 	= (int) $to;
+				
+			$query = 'SELECT 
+					c.description, 
+					c.name,
+					c.category,
+					c.company_id,
+					cl.logo, 
+					ca.name as category_name,
+					MATCH (c.name, c.description)
+					AGAINST ("'.$term.'" IN BOOLEAN MODE) AS coincidencias
+					FROM companies c
+					LEFT JOIN categories ca ON ca.category_id = c.category
+					LEFT JOIN company_logo cl ON c.company_id = cl.company_id
+					WHERE MATCH (c.name, c.description)
+					AGAINST ("'.$term.'" IN BOOLEAN MODE)
+					AND c.published = 1
+					GROUP BY c.company_id
+					ORDER BY coincidencias DESC
+					LIMIT '.$from.', '.$to;
+// 			echo $query;
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * countResultsAll
+	 * count the results
+	 * @param unknown $term
+	 * @return multitype:unknown |boolean
+	 */
+	
+	public function countResultsAll($term)
+	{
+		try
+		{
+			$term 	= str_replace('-', ' ', $term);
+			$from 	= (int) $from;
+			$to 	= (int) $to;
+				
+			$query = 'SELECT c.description, c.name, ca.name as category_name,
+					MATCH (c.name, c.description)
+					AGAINST ("'.$term.'" IN BOOLEAN MODE) AS coincidencias
+					FROM companies c
+					LEFT JOIN categories ca ON ca.category_id = c.category
+					WHERE MATCH (c.name, c.description)
+					AGAINST ("'.$term.'" IN BOOLEAN MODE)
+					GROUP BY c.company_id
+					ORDER BY coincidencias DESC';
+				
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function getEventsByCompany($companyId)
+	{
+		try
+		{
+			$query = 'SELECT e.*, 
+					l.logo, 
+					s.*,
+					ed.*
+					FROM companies e 
+					LEFT JOIN company_logo l ON l.company_id = e.company_id
+					LEFT JOIN seo s ON s.company_id = e.company_id
+					LEFT JOIN events ed ON ed.event_id = e.company_id
+					WHERE e.belong_company = '.$companyId.' 
+					ORDER BY ed.date DESC';
+			return $this->db->getArray($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function getAllMembers()
+	{
+		try {
+			$query = 'SELECT 
+					m.member_id,
+					m.member_name,
+					m.company_name,
+					m.position,
+					me.email,
+					mp.phone
+					FROM members m
+					LEFT JOIN member_emails me ON me.member_id = m.member_id
+					LEFT JOIN member_phones mp ON mp.member_id = m.member_id
+					GROUP BY m.member_id
+					ORDER BY m.member_id DESC';
 			
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function addMemberMessage($data)
-	{
-		try {
-			$query = 'INSERT INTO messages(member_id, user_id, from_user, to_user, message) VALUES(?, '.$_SESSION['userId'].' , '.$_SESSION['userId'].', ?, ?)';
-			$prep = $this->db->prepare($query);
-			$prep->bind_param('iis', $data['memberId'], $data['memberId'], $data['message']);
-			if ($prep->execute())
-			{
-				return $this->getMessageByMessageId($prep->insert_id);
-			}
-			else 
-			{
-				printf("Errormessage: %s\n", $prep->error);
-			}
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function addDocument($data)
-	{
-		try {
-			$query = 'INSERT INTO documents(member_id, payment_id, document) VALUES(?, ?, ?)';
-			$prep = $this->db->prepare($query);
-			$prep->bind_param('iis', $data['memberId'], $data['paymentId'], $data['documentUploaded']);
-			if ($prep->execute())
-			{
-				return true;
-			}
-			else 
-			{
-				return false;
-			}
-		} catch (Exception $e) {
-			return false;
-		}
-	}
-	
-	public function getDocumentsByPaymentId($paymentId)
-	{
-		try {
-			$query = 'SELECT * FROM documents WHERE payment_id = '.$paymentId;
 			return $this->db->getArray($query);
 		} catch (Exception $e) {
 			return false;
 		}
 	}
 	
-	public function deleteOwner($memberId)
+	public function getMemberDetail($memberId)
 	{
 		try {
-			$query = 'DELETE FROM members WHERE member_id = '.$memberId;
-			return $this->db->run($query);
+			$memberId = (int) $memberId;
+			$query = 'SELECT
+					*
+					FROM members m
+					WHERE m.member_id = '.$memberId.'
+					GROUP BY m.member_id
+					ORDER BY m.member_id DESC';
+				
+			return $this->db->getRow($query);
 		} catch (Exception $e) {
 			return false;
 		}
 	}
 	
-	public function deletePayment($paymentId)
+	public function getMemberEmails($memberId)
 	{
 		try {
-			$query = 'DELETE FROM payments WHERE payment_id = '.$paymentId;
+			$memberId = (int) $memberId;
+			$query = 'SELECT email_id, email 
+					FROM member_emails 
+					WHERE member_id = '.$memberId;
+			return $this->db->getArray($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function getMemberPhones($memberId)
+	{
+		try {
+			$memberId = (int) $memberId;
+			$query = 'SELECT * 
+					FROM member_phones 
+					WHERE member_id = '.$memberId;
+			return $this->db->getArray($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function updateMemberInfo($data)
+	{
+		try
+		{
+			$member = (int) $data['memberId'];
+				
+			$query = 'UPDATE members
+					SET member_name = ?,
+					company_name = ?,
+					position = ?,
+					company_type = ?,
+					address = ?,
+					notes = ?
+					WHERE member_id = ?';
+
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('ssssssi',
+					$data['memberName'],
+					$data['memberCompany'],
+					$data['memberPosition'],
+					$data['memberCompanyType'],
+					$data['memberAddress'],
+					$data['memberNotes'],
+					$data['memberId']);
+				
+			return $prep->execute();
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function updateMemberEmail($data)
+	{
+		try {
+			$emailId = (int) $data['emailId'];
+			$query = 'UPDATE member_emails
+					SET email = ?
+					WHERE email_id = ?';
+				
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('si',
+					$data['emailVal'],
+					$emailId);
+			return $prep->execute();
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function addMemberEmail($data)
+	{
+		try {
+			$memberId = (int) $data['memberId'];
+			$query = 'INSERT INTO member_emails(member_id, email)
+						VALUES(?, ?)';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('is',
+					$memberId,
+					$data['emailVal']);
+			$prep->execute();
+		} catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function updateMemberPhone($data)
+	{
+		try {
+			$phoneId = (int) $data['phoneId'];
+			$query = 'UPDATE member_phones
+					SET phone = ?
+					WHERE phone_id = ?';
+	
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('si',
+					$data['phoneVal'],
+					$phoneId);
+			return $prep->execute();
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function addMemberPhone($data)
+	{
+		try {
+			$memberId = (int) $data['memberId'];
+			$query = 'INSERT INTO member_phones(member_id, phone, type)
+						VALUES(?, ?, 1)';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('is',
+					$memberId,
+					$data['phoneVal']);
+			$prep->execute();
+		} catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function countCompanyPromoted()
+	{
+		try {
+			$query = 'SELECT COUNT(*) FROM companies WHERE main_promoted = 1';
+			return $this->db->getValue($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function promoteCompany($companyId, $todo)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+	
+			$query = 'UPDATE companies SET main_promoted = '.$todo.'
+					WHERE company_id = '.$companyId;
+	
 			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function asociateEvent($data, $date)
+	{
+		try {
+			$query = 'UPDATE companies SET belong_company = '.$data['companyId'].' WHERE company_id = '.$data['eventId'];
+			
+			if ($this->db->run($query))
+			{
+				$query = 'INSERT INTO events(event_id, date) VALUES(?, ?)';
+				
+				$prep = $this->db->prepare($query);
+				
+				$prep->bind_param('is',
+						$data['eventId'],
+						$date);
+				
+				return $prep->execute();
+			}
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function addEvent($data, $date)
+	{
+		try
+		{
+			$companyId = 0;
+			$query = 'INSERT INTO companies(name, belong_company, event, published) VALUES(?, ?, 1, 0)';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('si', $data['eventName'], $data['companyId']);
+				
+			if ($prep->execute())
+			{
+				$companyId = $prep->insert_id;
+	
+				$query = 'INSERT INTO social(company_id) values('.$companyId.')';
+	
+				if ($this->db->run($query)) {
+						
+					$query = 'INSERT INTO seo(company_id) values('.$companyId.')';
+					if ($this->db->run($query)) {
+						
+						$query = 'INSERT INTO events(event_id, date) VALUES(?, ?)';
+						
+						$prep = $this->db->prepare($query);
+						
+						$prep->bind_param('is',
+								$companyId,
+								$date);
+						
+						return $prep->execute();
+					}
+				}
+	
+			}
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function deleteEvent($data)
+	{
+		try {
+			$query = 'DELETE FROM events WHERE event_id = '.$data['eventId'];
+			if ($this->db->run($query))
+			{
+				$query = 'UPDATE companies SET belong_company = NULL WHERE company_id = '.$data['eventId'];
+				
+				if ($this->db->run($query))
+				{
+					echo 1;
+				}
+			}
+			
 		} catch (Exception $e) {
 			return false;
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

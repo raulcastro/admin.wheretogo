@@ -1,6 +1,17 @@
 <?php
 session_start();
 
+$loginHelper = '';
+
+if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1')
+{
+	$loginHelper = "http://admin.wheretogo.dev/fbconfig.php";
+}
+else 
+{
+	$loginHelper = "http://admin.wheretogo.com.mx/fbconfig.php";
+}
+
 // added in v4.0.0
 require_once 'autoload.php';
 use Facebook\FacebookSession;
@@ -19,7 +30,7 @@ use Facebook\HttpClients\FacebookHttpable;
 FacebookSession::setDefaultApplication( '1725035647798732','f1b4af5e5bc98e5e7ecbdd7cb806869c' );
 
 // login helper with redirect_uri
-$helper = new FacebookRedirectLoginHelper('http://admin.wheretogo.dev/fbconfig.php' );
+$helper = new FacebookRedirectLoginHelper($loginHelper);
 
 try {
 	$session = $helper->getSessionFromRedirect();

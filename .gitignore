@@ -2,6 +2,7 @@
 databases/
 deploy/
 Framework/Connection_Data.php
+media/
 
 # Useless folders
 img-up/
