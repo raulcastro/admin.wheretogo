@@ -49,7 +49,7 @@ RewriteRule ^admin/grid/unpublished/$ /admin/grid.php?infoRequest=unpublished
 RewriteRule ^admin/grid/location/([0-9]+)/([A-Za-z0-9-]+)/$ /admin/grid.php?infoRequest=location&locationId=$1
 
 #Edit  companies
-RewriteRule ^admin/edit-company/main/([0-9]+)/([A-Za-z0-9-]+)/$ /admin/edit-company.php?company=$1
+RewriteRule ^edit-company/main/([0-9]+)/([A-Za-z0-9-]+)/$ /edit-company.php?company=$1
 
 #main-sliders
 RewriteRule ^admin/maingallery/$ /admin/main-gallery.php

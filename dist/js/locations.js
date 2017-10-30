@@ -26,7 +26,7 @@ function deleteLocation(){
 	
 	$.ajax({
         type:   'POST',
-        url:    '/ajax/back/locations.php?option=4',
+        url:    '/ajax/locations.php?option=4',
         data:{  
         	locId : locId
              },
@@ -50,7 +50,7 @@ function updateLocation()
 	
 	$.ajax({
         type:   'POST',
-        url:    '/ajax/back/locations.php?option=3',
+        url:    '/ajax/locations.php?option=3',
         data:{  
         	locId			: locId,
         	locName			: locName,
@@ -74,7 +74,7 @@ function getLocationInfo(node)
 	
 	$.ajax({
         type:   'POST',
-        url:    '/ajax/back/locations.php?option=2',
+        url:    '/ajax/locations.php?option=2',
         data:{  
         	locId	: locId
              },
@@ -101,7 +101,7 @@ function addLocation()
 	
     $.ajax({
         type:   'POST',
-        url:    '/ajax/back/locations.php?option=1',
+        url:    '/ajax/locations.php?option=1',
         data:{  
         	locationName : locationName
              },

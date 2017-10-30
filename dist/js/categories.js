@@ -33,7 +33,7 @@ function addSubcategory()
 	
 	$.ajax({
         type:   'POST',
-        url:    '/ajax/back/categories.php?option=5',
+        url:    '/ajax/categories.php?option=5',
         data:{  
         	catId : catId,
         	subName: subName
@@ -56,7 +56,7 @@ function deleteCategory(){
 	
 	$.ajax({
         type:   'POST',
-        url:    '/ajax/back/categories.php?option=4',
+        url:    '/ajax/categories.php?option=4',
         data:{  
         	catId : catId
              },
@@ -81,7 +81,7 @@ function updateCategory()
 	
 	$.ajax({
         type:   'POST',
-        url:    '/ajax/back/categories.php?option=3',
+        url:    '/ajax/categories.php?option=3',
         data:{  
         	catId			: catId,
         	catName			: catName,
@@ -112,7 +112,7 @@ function getCategoryInfo(node)
 	
 	$.ajax({
         type:   'POST',
-        url:    '/ajax/back/categories.php?option=2',
+        url:    '/ajax/categories.php?option=2',
         data:{  
         	catId	: catId
              },
@@ -144,7 +144,7 @@ function addCategory()
 	
     $.ajax({
         type:   'POST',
-        url:    '/ajax/back/categories.php?option=1',
+        url:    '/ajax/categories.php?option=1',
         data:{  
         	categoryName	: categoryName
              },

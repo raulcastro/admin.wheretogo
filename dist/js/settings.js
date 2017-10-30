@@ -28,7 +28,7 @@ function updateSettings()
 	
     $.ajax({
         type:   'POST',
-        url:    '/ajax/back/settings.php?option=1',
+        url:    '/ajax/settings.php?option=1',
         data:{  
         	siteTittle		: siteTittle,
         	siteName		: siteName,	

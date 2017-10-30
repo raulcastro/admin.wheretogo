@@ -833,16 +833,16 @@ class Layout_View
 				$logo = "/dist/img/default/companies/logo/logo.jpg";
 			}
 		?>
-		<div class='col-lg-3 col-md-6 company-item'>
-			<div class="box box-primary">
-				<div class="box-body box-profile">
-					<a href="/admin/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><img class="profile-user-img img-responsive" src="<?php echo $logo; ?>" alt="User profile picture"></a>
-					<h3 class="profile-username text-center"><a href="/admin/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><?php echo $a['name']; ?></a></h3>
-					<p class="text-muted text-center"><?php echo $a['category']; ?></p>
+			<div class='col-lg-3 col-md-6 company-item'>
+				<div class="box box-primary">
+					<div class="box-body box-profile">
+						<a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><img class="profile-user-img img-responsive" src="<?php echo $logo; ?>" alt="User profile picture"></a>
+						<h3 class="profile-username text-center"><a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><?php echo $a['name']; ?></a></h3>
+						<p class="text-muted text-center"><?php echo $a['category']; ?></p>
+					</div>
+					<!-- /.box-body -->
 				</div>
-				<!-- /.box-body -->
 			</div>
-		</div>
 		<?php 
 		}
 		?>
@@ -2168,7 +2168,7 @@ class Layout_View
 												<input type="" class="form-control" id="categoryName" placeholder="Category name" value="">
 											</div>
 											<div class="col-sm-2">
-												<button type="submit" class="btn btn-success addCategory">Add</button>
+												<button type="submit" class="btn btn-sm btn-info addCategory">Add</button>
 											</div>
 					                  	</div>
 									</form>
@@ -2218,8 +2218,8 @@ class Layout_View
 										
 										<div class="form-group">
 											<div class="col-sm-offset-8 col-sm-10">
-												<button type="submit" class="btn btn-sm btn-danger delete-category">Delete</button>
-												<button type="submit" class="btn btn-sm btn-info update-category">Save</button>
+												<button type="submit" class="btn btn-xs btn-danger delete-category">Delete</button>
+												<button type="submit" class="btn btn-xs btn-info update-category">Save</button>
 											</div>
 										</div>
 										
@@ -2236,7 +2236,7 @@ class Layout_View
 													<input type="" class="form-control" id="subcategoryName" placeholder="Subcategory name" value="">
 												</div>
 												<div class="col-sm-2">
-													<button type="submit" class="btn btn-success addSubcategory">Add</button>
+													<button type="submit" class="btn btn-xs btn-info addSubcategory">Add</button>
 												</div>
 						                  	</div>
 										</form>
