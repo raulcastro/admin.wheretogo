@@ -38,7 +38,7 @@ RewriteRule ^grid/location/([0-9]+)/([A-Za-z0-9-]+)/$ 	/grid.php?infoRequest=loc
 RewriteRule ^edit-company/main/([0-9]+)/([A-Za-z0-9-]+)/$ /edit-company.php?company=$1
 
 #main-sliders
-RewriteRule ^admin/maingallery/$ /admin/main-gallery.php
+RewriteRule ^maingallery/$ /main-gallery.php
 
 #videos
 RewriteRule ^admin/main-videos/$ /admin/videos.php?section=8

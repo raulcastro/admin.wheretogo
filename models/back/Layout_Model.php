@@ -98,7 +98,6 @@ class Layout_Model
 		{
 			$query = 'INSERT INTO main_gallery(name)
 	                VALUES("'.$name.'")';
-
 			if ($this->db->run($query))
 				return $this->db->insert_id;
 		}

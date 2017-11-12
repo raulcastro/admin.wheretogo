@@ -706,13 +706,13 @@ class Layout_View
 		   				    ?>
                         </ul>
                     </li>
-					<!-- 
+					
 					<li>
-						<a href="/admin/maingallery/">
+						<a href="/maingallery/">
 							<i class="fa fa-file-photo-o"></i> <span>Main Gallery</span>
 						</a>
 					</li>
-					
+					<!-- 
 					<li>
 						<a href="/admin/main-videos/">
 							<i class="fa  fa-video-camera"></i> <span>Videos</span>
@@ -1677,8 +1677,8 @@ class Layout_View
     	ob_start();
     	?>
     	<script type="text/javascript"></script>
-    	<link href="/css/back/uploadfile.css" rel="stylesheet">
-    	<link href="/css/back/jquery.drag-n-crop.css" rel="stylesheet" type="text/css">
+    	<link href="/plugins/jquery.uploadfile/uploadfile.css" rel="stylesheet">
+    	<link href="/plugins/jquery.drag-n-crop/jquery.drag-n-crop.css" rel="stylesheet" type="text/css">
     	<?php
     	$head = ob_get_contents();
     	ob_end_clean();
@@ -1689,25 +1689,26 @@ class Layout_View
     {
     	ob_start();
     	?>
-    	<script src="/js/jquery-ui.min.js"></script>
-    		<script src="/js/back/jquery.uploadfile.min.js"></script>
-    		<script src="/js/back/imagesloaded.js"></script>
-			<script src="/js/back/scale.fix.js"></script>
-			<script src="/js/back/jquery.drag-n-crop.js"></script>
-			<script src="/js/back/main-sliders.js"></script>
+    	<script src="/plugins/jQueryUI/jquery-ui.min.js"></script>
+    		<script src="/plugins/jquery.uploadfile/jquery.uploadfile.min.js"></script>
+    		<script src="/plugins/imagesloaded/imagesloaded.js"></script>
+			<script src="/plugins/scale.fix/scale.fix.js"></script>
+			<script src="/plugins/jquery.drag-n-crop/jquery.drag-n-crop.js"></script>
+			<script src="/dist/js/main-sliders.js"></script>
         	<script type="text/javascript">
-			width = 0;
-			height = 0;
-			image = "";
-			x=0;
-			y=0;
-			lastId = 0;
+			width 	= 0;
+			height 	= 0;
+			image 	= "";
+			x		= 0;
+			y		= 0;
+			lastId 	= 0;
+			
 			var dnd;
 			
         	$(document).ready(function()
         	{
         		$(".uploader").uploadFile({
-	        		url:"/ajax/back/main-sliders.php?option=1",
+	        		url:"/ajax/main-sliders.php?option=1",
 	        		fileName:"myfile",
 	        		multiple: false,
 	        		doneStr:"uploaded!",
@@ -1725,7 +1726,7 @@ class Layout_View
 				
         		function createDrag(image)
         		{
-            		source = '/img-up/main-gallery/medium/'+image;
+            		source = '/media/sliders/resized/'+image;
             		$('#crop').attr('src', source);
         			dnd = $('#crop').dragncrop({
             			instruction: false,
@@ -1767,7 +1768,7 @@ class Layout_View
         		
         	    $.ajax({
         	        type:   'POST',
-        	        url:    '/ajax/back/main-sliders.php?option=2',
+        	        url:    '/ajax/main-sliders.php?option=2',
         	        data:{  x: x,
         	                y: y,
         	            imgId: imgId
@@ -1787,7 +1788,7 @@ class Layout_View
 								+'<div class="row">'
  									+'<div class="col-md-2"><br>'
 										+'<div class="img-container">'
-											+'<img src="/img-up/main-gallery/thumb/'+imgId+'" />'
+											+'<img src="/media/sliders/thumbnail/'+imgId+'" />'
 										+'</div>'
  									+'</div>'
 									+'<div class="col-md-10"><br>'
@@ -1856,7 +1857,7 @@ class Layout_View
 					
 					<div class="clear"></div>
 					<br>
-					<p class="text-muted">(2048px / 1100px | JPG)</p>
+					<p class="text-muted">(1200px / 674px | JPG)</p>
 			
 					<div class="slider-box">
 						<div class="main-slider-upload">
@@ -1866,12 +1867,12 @@ class Layout_View
 							<div class="clear"></div>
 							<br>
 							<div class="crop-box">
-								<div style="width: 900px; height:483px" class="crop-container"><img src="" id="crop" /></div>
+								<div style="width: 800px; height:448px" class="crop-container"><img src="" id="crop" /></div>
 							</div>
 							
 							<div class="form-group">
 								<div class="col-sm-1">
-									<button type="button"class="btn btn-block btn-success save-crop"  id="save-crop">Save</button>
+									<button type="button"class="btn btn-sm btn-block btn-info save-crop"  id="save-crop">Save</button>
 								</div>
 								<div class="col-sm-11"></div>
 							</div>
@@ -1891,7 +1892,7 @@ class Layout_View
 									<div class="col-md-2">
 										<br>
 										<div class="img-container">
-						    				<img src="/img-up/main-gallery/thumb/<?php echo $slider['name']; ?>" />
+						    				<img src="/media/sliders/thumbnail/<?php echo $slider['name']; ?>" />
 						    			</div>
 					    			</div>
 					    			<div class="col-md-10">
