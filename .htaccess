@@ -16,24 +16,10 @@ RewriteRule ^(.*)$          http://%1/$1    [L,R,NE]
 #Needed
 RewriteRule ^sitemap.xml$ sitemap.xml
 
-# Rewrite Rules
-RewriteRule ^location/([0-9]+)/([A-Za-z0-9-]+)/$ /cover_category.php?location=$1
-RewriteRule ^company/([0-9]+)/([A-Za-z0-9-]+)/([0-9]+)/([A-Za-z0-9-]+)/$ /show_company.php?category=$1&company=$3
-RewriteRule ^company/([0-9]+)/([A-Za-z0-9-]+)/([0-9]+)/([A-Za-z0-9-]+)/([0-9]+)/([A-Za-z0-9-]+)/$ /show_company.php?category=$1&subcategory=$3&company=$5
-RewriteRule ^([0-9]+)/([A-Za-z0-9-]+)/$ /cover_category.php?category=$1
-RewriteRule ^events/([0-9]+)/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/([0-9]+)/([A-Za-z0-9-]+)/$ /show_company.php?belong_company=$1&company=$4
-RewriteRule ^events/$ /cover_events.php?category=$1
-
-RewriteRule ^([0-9]+)/([A-Za-z0-9-]+)/([0-9]+)/([A-Za-z0-9-]+)/$ /cover_category.php?category=$1&subcategory=$3
-
 # Search links
 RewriteRule ^search/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)$ /search.php?categoryName=$1&categoryId=$2&term=$3&from=$4
 RewriteRule ^search/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)$ /search.php?categoryName=$1&categoryId=$2&term=$3&from=$4&to=$5
 
-#Static sites
-RewriteRule ^map/$ /map.php
-RewriteRule ^videos/$ /videos.php
-RewriteRule ^contact-us/$ /contact.php
 
 #Admin section
 
@@ -42,11 +28,11 @@ RewriteRule ^contact-us/$ /contact.php
 RewriteRule ^admin/add-company/$ /admin/add-company.php?1&section=2
 
 #grid
-RewriteRule ^admin/dashboard/$ /admin/dashboard.php?section=3
-RewriteRule ^admin/grid/category/([0-9]+)/([A-Za-z0-9-]+)/$ /admin/grid.php?infoRequest=category&categoryId=$1
-RewriteRule ^admin/grid/promoted/$ /admin/grid.php?infoRequest=promoted
-RewriteRule ^admin/grid/unpublished/$ /admin/grid.php?infoRequest=unpublished
-RewriteRule ^admin/grid/location/([0-9]+)/([A-Za-z0-9-]+)/$ /admin/grid.php?infoRequest=location&locationId=$1
+RewriteRule ^dashboard/$ 								/dashboard.php?section=3
+RewriteRule ^grid/category/([0-9]+)/([A-Za-z0-9-]+)/$ 	/grid.php?infoRequest=category&categoryId=$1
+RewriteRule ^grid/promoted/$ 							/grid.php?infoRequest=promoted
+RewriteRule ^grid/unpublished/$ 						/grid.php?infoRequest=unpublished
+RewriteRule ^grid/location/([0-9]+)/([A-Za-z0-9-]+)/$ 	/grid.php?infoRequest=location&locationId=$1
 
 #Edit  companies
 RewriteRule ^edit-company/main/([0-9]+)/([A-Za-z0-9-]+)/$ /edit-company.php?company=$1

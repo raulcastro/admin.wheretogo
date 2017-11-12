@@ -646,7 +646,7 @@ class Layout_View
 		   				    {
 		   				    ?>
 		   			        <li>
-		   						<a href="/admin/grid/category/<?php echo $c['category_id']; ?>/<?php echo Tools::slugify($c['name']); ?>/">
+		   						<a href="/grid/category/<?php echo $c['category_id']; ?>/<?php echo Tools::slugify($c['name']); ?>/">
 		   							<i class="fa  fa-tag"></i>
 		   							<?php echo $c['name']; ?>
 		   						</a>
@@ -658,7 +658,7 @@ class Layout_View
                     </li>
                     
                     <li>
-						<a href="/admin/grid/promoted/">
+						<a href="/grid/promoted/">
 						<i class="fa fa-star"></i> <span>Promoted</span>
 							<span class="pull-right-container">
 								<small class="label pull-right bg-blue"><?php echo $this->data['nPromoted']; ?></small>
@@ -667,7 +667,7 @@ class Layout_View
 					</li>
 					
 					<li>
-						<a href="/admin/grid/unpublished/">
+						<a href="/grid/unpublished/">
 						<i class="fa fa-ban"></i> <span>Unpublished</span>
 							<span class="pull-right-container">
 								<small class="label pull-right bg-red"><?php echo $this->data['nNoPublish']; ?></small>
@@ -696,7 +696,7 @@ class Layout_View
 		   				    {
 		   				    ?>
 		   			        <li>
-		   						<a href="/admin/grid/location/<?php echo $c['location_id']; ?>/<?php echo Tools::slugify($c['name']); ?>/">
+		   						<a href="/grid/location/<?php echo $c['location_id']; ?>/<?php echo Tools::slugify($c['name']); ?>/">
 		   							<i class="fa fa-map-pin"></i>
 		   							<?php echo $c['name']; ?>
 		   						</a>
