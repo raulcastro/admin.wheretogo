@@ -224,15 +224,15 @@ class Layout_View
 	    	ob_start();
 	    	?>
 	    <!-- Bootstrap 3.3.6 -->
-	    <link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
+	    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
 	    <!-- Font Awesome -->
 	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
 	    <!-- Ionicons -->
 	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
 	    <!-- Theme style -->
-	    <link rel="stylesheet" href="../../dist/css/AdminLTE.min.css">
+	    <link rel="stylesheet" href="/dist/css/AdminLTE.min.css">
 	    <!-- iCheck -->
-	    <link rel="stylesheet" href="../../plugins/iCheck/square/blue.css">
+	    <link rel="stylesheet" href="/plugins/iCheck/square/blue.css">
 	    
 	    <link rel="stylesheet" href="/dist/css/skins/skin-blue.min.css">
        	<link href="/dist/css/Custom.css" media="screen" rel="stylesheet" type="text/css" />
@@ -261,9 +261,9 @@ class Layout_View
 	    	ob_start();
 	    	?>
 	    <!-- jQuery 2.2.3 -->
-	    <script src="../../plugins/jQuery/jquery-2.2.3.min.js"></script>
+	    <script src="/plugins/jQuery/jquery-2.2.3.min.js"></script>
 	    <!-- Bootstrap 3.3.6 -->
-	    <script src="../../bootstrap/js/bootstrap.min.js"></script>
+	    <script src="/bootstrap/js/bootstrap.min.js"></script>
 	    <!-- AdminLTE App -->
     		<script src="/dist/js/app.min.js"></script>
     		<!-- SlimScroll -->
@@ -860,8 +860,8 @@ class Layout_View
     	?>
     	<!-- bootstrap wysihtml5 - text editor -->
   		<link rel="stylesheet" href="/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
-  		<link href="/css/back/uploadfile.css" rel="stylesheet">
-  		<link href="/css/back/jquery.drag-n-crop.css" rel="stylesheet" type="text/css">
+  		<link href="/plugins/jquery.uploadfile/uploadfile.css" rel="stylesheet">
+  		<link href="/plugins/jquery.drag-n-crop/jquery.drag-n-crop.css" rel="stylesheet" type="text/css">
   		<!-- Select2 -->
   		<link rel="stylesheet" href="/plugins/select2/select2.min.css">
   		<!-- bootstrap datepicker -->
@@ -879,11 +879,11 @@ class Layout_View
     	?>
     	<script src="/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
     	
-    	<script src="/js/jquery-ui.min.js"></script>
-    	<script src="/js/back/jquery.uploadfile.min.js"></script>
-    	<script src="/js/back/imagesloaded.js"></script>
-		<script src="/js/back/scale.fix.js"></script>
-		<script src="/js/back/jquery.drag-n-crop.js"></script>
+    	<script src="/plugins/jQueryUI/jquery-ui.min.js"></script>
+    	<script src="/plugins/jquery.uploadfile/jquery.uploadfile.min.js"></script>
+    	<script src="/plugins/imagesloaded/imagesloaded.js"></script>
+		<script src="/dist/js/scale.fix.js"></script>
+		<script src="/plugins/jquery.drag-n-crop/jquery.drag-n-crop.js"></script>
 		<!-- Select2 -->
 		<script src="/plugins/select2/select2.full.min.js"></script>	
 		<!-- bootstrap datepicker -->
@@ -947,7 +947,7 @@ class Layout_View
 		});
   	  
 		</script>
-		<script src="/js/back/company.js"></script>
+		<script src="/dist/js/company.js"></script>
 		
     	<?php
     	$scripts = ob_get_contents();
@@ -993,13 +993,13 @@ class Layout_View
 							   					if ($this->data['company']['logo']['logo'])
 							   					{
 							   						?>
-							   						<img id="companyLogo" src="/img-up/companies_pictures/logo/<?php echo $this->data['company']['logo']['logo']; ?>"  />
+							   						<img id="companyLogo" src="/media/companies/logo/<?php echo $this->data['company']['logo']['logo']; ?>"  />
 							   						<?php 
 							   					}
 							   					else
 							   					{
 							   						?>
-							   						<img id="companyLogo" src="/images/default_item_front.jpg"  width="300" height="150" />
+							   						<img id="companyLogo" src="/dist/img/default/companies/logo/logo.jpg"  width="300" height="150" />
 							   						<?php
 							   					}
 							   					?>
@@ -1253,7 +1253,7 @@ class Layout_View
 													</header>
 													<section>
 														<div class="img-container">
-										    				<img src="/img-up/companies_pictures/sliders/<?php echo $slider['slider']; ?>" class="img-responsive" />
+										    				<img src="/media/companies/sliders/<?php echo $slider['slider']; ?>" class="img-responsive" />
 										    			</div>
 													</section>
 													<div class="clr"></div>
@@ -1285,7 +1285,7 @@ class Layout_View
 												?>
 												<div class="image-box" id="cgid-<?php echo $g['picture_id']; ?>">
 													<div class="image">		
-														<img src="/img-up/companies_pictures/galery/<?php echo $g['picture']; ?>" />
+														<img src="/media/companies/gallery/<?php echo $g['picture']; ?>" />
 													</div>
 													<a href="javascript:void(0);" cgid="<?php echo $g['picture_id']; ?>" class="deleteGallery" >delete</a>
 												</div>
@@ -1549,7 +1549,7 @@ class Layout_View
 							   					if ($event['logo'])
 							   					{
 							   						?>
-							   						<img class="profile-user-img img-responsive" src="/img-up/companies_pictures/logo/<?php echo $event['logo']; ?>" alt="User profile picture">
+							   						<img class="profile-user-img img-responsive" src="/media/companies/logo/<?php echo $event['logo']; ?>" alt="User profile picture">
 							   						<?php 
 							   					}
 							   					else
@@ -1585,7 +1585,21 @@ class Layout_View
 								?>
 								<div class="form-group">
 									<div class="col-sm-2">
-										<button type="button" id="promote-company" class="btn btn-block btn-info <?php if ($this->data['company']['general']['main_promoted'] == 1){ echo 'bg-purple';} ?>">Main Promoted</button>
+										<button type="button" id="mainPromoteCompany" class="btn btn-block btn-info <?php if ($this->data['company']['general']['main_promoted'] == 1){ echo 'bg-purple';} ?>">Main Promoted</button>
+									</div>
+									<div class="col-sm-10"></div>
+								</div>
+							<?php 
+							}
+							?>
+							
+							<?php 
+							if ($this->data['company']['general']['event'] == 0)
+							{
+								?>
+								<div class="form-group">
+									<div class="col-sm-2">
+										<button type="button" id="promoteCompany" class="btn btn-block btn-info <?php if ($this->data['company']['general']['promoted'] == 1){ echo 'bg-purple';} ?>">Promoted</button>
 									</div>
 									<div class="col-sm-10"></div>
 								</div>
@@ -1593,6 +1607,7 @@ class Layout_View
 							}
 							?>
 								
+								<!-- 
 								<div class="form-group">
 									<div class="col-sm-2">
 										<button type="button" class="btn btn-block btn-info">Phones Hidden</button>
@@ -1613,6 +1628,7 @@ class Layout_View
 									</div>
 									<div class="col-sm-10"></div>
 								</div>
+								 -->
 								
 								<div class="form-group">
 									<div class="col-sm-2">
@@ -2461,10 +2477,10 @@ class Layout_View
         <footer class="main-footer">
             <!-- To the right -->
             <div class="pull-right hidden-xs">
-                Property Managements
+                <i><b>W2G</b> Leading the future <s>mofos</s></i>
             </div>
             <!-- Default to the left -->
-            <strong>Copyright &copy; 2017 <a href="#"><?php echo $this->data['appInfo']['siteName']; ?></a>.</strong> All rights reserved.
+            <strong>Copyright &copy; 2018 <a href="#"><?php echo $this->data['appInfo']['siteName']; ?></a>.</strong> All rights reserved.
         </footer>
     	<?php
     	$footer = ob_get_contents();

@@ -1926,6 +1926,16 @@ class Layout_Model
 		}
 	}
 	
+	public function countMainCompanyPromoted()
+	{
+		try {
+			$query = 'SELECT COUNT(*) FROM companies WHERE main_promoted = 1';
+			return $this->db->getValue($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
 	public function countCompanyPromoted()
 	{
 		try {
@@ -1936,13 +1946,30 @@ class Layout_Model
 		}
 	}
 	
+	public function mainPromoteCompany($companyId, $todo)
+	{
+		try
+		{
+			$companyId = (int) $companyId;
+			
+			$query = 'UPDATE companies SET main_promoted = '.$todo.'
+					WHERE company_id = '.$companyId;
+			
+			return $this->db->run($query);
+		}
+		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
 	public function promoteCompany($companyId, $todo)
 	{
 		try
 		{
 			$companyId = (int) $companyId;
 	
-			$query = 'UPDATE companies SET main_promoted = '.$todo.'
+			$query = 'UPDATE companies SET promoted = '.$todo.'
 					WHERE company_id = '.$companyId;
 	
 			return $this->db->run($query);
