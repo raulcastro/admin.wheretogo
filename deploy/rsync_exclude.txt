@@ -11,7 +11,8 @@ media/
 deploy/
 databases/
 img-up/
-#Framework/Connection_Data.php
+Framework/Connection_Data.php
+fbconfig.php
 files/
 images/owners-profile/
 uploads/documents/

@@ -17,8 +17,8 @@ switch ($_GET['option'])
 		
 		$uploader 	= new Media_Model($allowedExtensions, $sizeLimit);
 		
-		$savePath 		= $root.'/img-up/companies_pictures/original/';
-		$medium 		= $root.'/img-up/companies_pictures/galery/';
+		$savePath 		= $root.'/media/companies/original/';
+		$medium 		= $root.'/media/companies/gallery/';
 		$pre	  		= 'gallery-'.Tools::slugify($_POST['companyName']);
 		$mediumWidth 	= 200;
 		

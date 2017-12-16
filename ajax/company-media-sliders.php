@@ -13,13 +13,13 @@ switch ($_GET['option'])
 		$data 	= $backend->loadBackend();
 		
 		$allowedExtensions = array("jpg", "JPG", "jpeg", "png");
-		$sizeLimit 	= 20 * 1024 * 1024;
+		$sizeLimit 		= 20 * 1024 * 1024;
 		
-		$uploader 	= new Media_Model($allowedExtensions, $sizeLimit);
+		$uploader 		= new Media_Model($allowedExtensions, $sizeLimit);
 		
-		$savePath 		= $root.'/img-up/companies_pictures/original/';
-		$medium 		= $root.'/img-up/companies_pictures/medium_sliders/';
-		$pre	  		= Tools::slugify($_POST['companyName']);
+		$savePath 		= $root.'/media/companies/original/';
+		$medium 			= $root.'/media/companies/medium-sliders/';
+		$pre	  			= Tools::slugify($_POST['companyName']);
 		$mediumWidth 	= 1170;
 		
 		if ($result = $uploader->handleUpload($savePath, $pre))
@@ -31,7 +31,6 @@ switch ($_GET['option'])
 		
 			$wp     = $newData[0];
 			$hp     = $newData[1];
-			
 			
 			$lastId = 0;
 			
@@ -57,8 +56,8 @@ switch ($_GET['option'])
 			$dstWidth = 1170;
 			$dstImageHeight = 526;
 			 
-			$source		 = $root.'/img-up/companies_pictures/original/'.$_POST['imgId'];
-			$destination = $root.'/img-up/companies_pictures/sliders/'.$_POST['imgId'];
+			$source		 = $root.'/media/companies/original/'.$_POST['imgId'];
+			$destination = $root.'/media/companies/sliders/'.$_POST['imgId'];
 			 
 			if ($model -> cropImage($_POST, $dstWidth, $dstImageHeight, $source, $destination))
 			{

@@ -17,8 +17,8 @@ switch ($_GET['option'])
 		
 		$uploader 	= new Media_Model($allowedExtensions, $sizeLimit);
 		
-		$savePath 		= $root.'/img-up/companies_pictures/original/';
-		$medium 		= $root.'/img-up/companies_pictures/medium/';
+		$savePath 		= $root.'/media/companies/original/';
+		$medium 		= $root.'/media/companies/medium/';
 		$pre	  		= 'logo-'.Tools::slugify($_POST['companyName']);
 		$mediumWidth 	= 300;
 		
@@ -62,8 +62,8 @@ switch ($_GET['option'])
 			$dstWidth = 300;
 			$dstImageHeight = 150;
 			 
-			$source		 = $root.'/img-up/companies_pictures/original/'.$_POST['imgId'];
-			$destination = $root.'/img-up/companies_pictures/logo/'.$_POST['imgId'];
+			$source		 = $root.'/media/companies/original/'.$_POST['imgId'];
+			$destination = $root.'/media/companies/logo/'.$_POST['imgId'];
 			 
 			if ($model -> cropImage($_POST, $dstWidth, $dstImageHeight, $source, $destination))
 			{

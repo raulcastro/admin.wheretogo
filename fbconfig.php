@@ -5,11 +5,11 @@ $loginHelper = '';
 
 if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1')
 {
-	$loginHelper = "http://admin.wheretogo.dev/fbconfig.php";
+	$loginHelper = "http://admin.wheretogo.localhost/fbconfig.php";
 }
 else 
 {
-	$loginHelper = "http://admin.wheretogo.com.mx/fbconfig.php";
+	$loginHelper = "http://admin.wheretogo.localhost/fbconfig.php";
 }
 
 // added in v4.0.0

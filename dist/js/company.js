@@ -81,11 +81,11 @@ $(document).ready(function()
 	xLogo		= 0;
 	yLogo		= 0;
 	lastIdLogo 	= 0;
-	var dncLogo;
+	
+	var 			dncLogo;
 	
 	if ($('#logoId').val() > 0)
 		lastIdLogo = $('#logoId').val();
-	
 	
 	$(".logo-uploader").uploadFile({
 		url:"/ajax/company-media-logo.php?option=1",
@@ -95,7 +95,8 @@ $(document).ready(function()
 		formData: {
 			"lastIdLogo":	lastIdLogo, 
 			"companyId":	companyId, 
-			"companyName": 	companyName},
+			"companyName": 	companyName
+			},
 		onSuccess:function(files, data, xhr)
 		{
 			obj 		= JSON.parse(data);
@@ -114,7 +115,7 @@ $(document).ready(function()
 	
 	function createDncLogo(image)
 	{
-		source = '/img-up/companies_pictures/medium/'+image;
+		source = '/media/companies/medium/'+image;
 		$('#cropLogo').attr('src', source);
 		dncLogo = $('#cropLogo').dragncrop({
 			instruction: 	false,
@@ -143,20 +144,23 @@ $(document).ready(function()
 	var dncSlider;
 	
 	$(".company-slider-uploader").uploadFile({
-		url:"/ajax/company-media-sliders.php?option=1",
-		fileName:"myfile",
-		multiple: false,
-		doneStr:"uploaded!",
-		formData: {
-			"companyId":companyId, 
-			"companyName": companyName},
+		url:			"/ajax/company-media-sliders.php?option=1",
+		fileName:	"myfile",
+		multiple: 	false,
+		doneStr:		"uploaded!",
+		formData: 
+			{
+				"companyId":companyId, 
+				"companyName": companyName
+			},
 		onSuccess:function(files, data, xhr)
 		{
-			obj 		= JSON.parse(data);
-			widthSlider 	= obj.wp;
-			heighSlider 	= obj.hp;
-			imageSlider 	= obj.fileName;
+			obj 				= JSON.parse(data);
+			widthSlider 		= obj.wp;
+			heighSlider 		= obj.hp;
+			imageSlider 		= obj.fileName;
 			lastIdSlider 	= obj.lastId;
+			
 			if (dncSlider){dncSlider.dragncrop('destroy');}
 			
 			createDncSlider(obj.fileName);
@@ -167,7 +171,7 @@ $(document).ready(function()
 	
 	function createDncSlider(image)
 	{
-		source = '/img-up/companies_pictures/medium_sliders/'+image;
+		source = '/media/companies/medium-sliders/'+image;
 		$('#crop-company-slider').attr('src', source);
 		dncSlider = $('#crop-company-slider').dragncrop({
 			instruction: false,
@@ -218,7 +222,7 @@ $(document).ready(function()
 			
 			itemGallery = '<div class="image-box" id="cgid-'+lastIdGallery+'">'
 			+'<div class="image">'
-			+'<img src="/img-up/companies_pictures/galery/'+imageGallery+'" />' 
+			+'<img src="/media/companies/gallery/'+imageGallery+'" />' 
 			+'</div>'
 			+'<a href="javascript:void(0);" cgid="'+lastIdGallery+'" class="deleteGallery" >delete</a>'
 			+'</div>';
@@ -273,7 +277,7 @@ function saveSliderCrop(xSlider, ySlider, imgId, lastIdSlider)
 								+ '</header>'
 								+ '<section>'
 								+ '	<div class="img-container">'
-								+ '		<img src="/img-up/companies_pictures/sliders/'+imgId+'" class="img-responsive" />'
+								+ '		<img src="/media/companies/sliders/'+imgId+'" class="img-responsive" />'
 								+ '	</div>'
 								+ '</section>'
 								+ '<div class="clr"></div>'
@@ -328,7 +332,7 @@ function saveLogoCrop(xLogo, yLogo, imgId)
         {
             if (0 != xml)
             {
-            	$('#companyLogo').attr('src','/img-up/companies_pictures/logo/'+imgId);
+            	$('#companyLogo').attr('src','/media/companies/logo/'+imgId);
 //            	$('.main-slider-upload').fadeOut();
             	
             }
@@ -403,11 +407,11 @@ function saveInfo()
 {
 	companyId			= $('#companyId').val();
 	companyDescription 	= $('#company-description').val();
-	companyName 		= $('#companyName').val();
-	companyLocation 	= $('#companyLocation').val();
+	companyName 			= $('#companyName').val();
+	companyLocation 		= $('#companyLocation').val();
 	locationArray 		= companyLocation.split(",");
-	companyLatitude 	= locationArray[0];
-	companyLongitude	= locationArray[1];
+	companyLatitude 		= locationArray[0];
+	companyLongitude		= locationArray[1];
 	
 	$.ajax({
         type:   'POST',
@@ -464,7 +468,7 @@ function updateCompany()
 function saveSeo()
 {
 	companyId				= $('#companyId').val();
-	companySeoTitle 		= $('#companySeoTitle').val();
+	companySeoTitle 			= $('#companySeoTitle').val();
 	companySeoKeywords 		= $('#companySeoKeywords').val();
 	companySeoDescription	= $('#companySeoDescription').val();
 	
@@ -499,8 +503,8 @@ function saveSocial()
 	companyFacebook		= $('#companyFacebook').val();
 	companyTripadvisor	= $('#companyTripadvisor').val();
 	companyYoutube		= $('#companyYoutube').val();
-	companyPinterest	= $('#companyPinterest').val();
-	companyInstagram	= $('#companyInstagram').val();
+	companyPinterest		= $('#companyPinterest').val();
+	companyInstagram		= $('#companyInstagram').val();
 	
 	$.ajax({
         type:   'POST',

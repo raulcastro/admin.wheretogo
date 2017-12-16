@@ -508,7 +508,7 @@ class Layout_View
 				<p class="login-box-msg">Sign in to start your session</p>
 				<div class="social-auth-links text-center">
 					<a href="/fbconfig.php" class="btn btn-block btn-social btn-facebook btn-flat">
-						<i class="fa fa-facebook"></i> Sign in using Facebook
+						<i class="fa fa-facebook"></i> Log-In using Facebook
 					</a>
 				</div>
 				<!-- /.social-auth-links -->
@@ -1205,7 +1205,7 @@ class Layout_View
 												Upload
 											</div>
 											<div class="logo-box">
-												<div style="width: 300px; height:150px" class="crop-container-logo"> <img src="/img-up/companies_pictures/logo/<?php echo $this->data['company']['logo']['logo']; ?>" id="cropLogo" /></div>
+												<div style="width: 300px; height:150px" class="crop-container-logo"> <img src="/media/companies/logo/<?php echo $this->data['company']['logo']['logo']; ?>" id="cropLogo" /></div>
 											</div>
 											<br>
 											<div class="form-group">
