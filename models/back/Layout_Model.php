@@ -908,6 +908,8 @@ class Layout_Model
 			LEFT JOIN company_logo p ON c.company_id = p.company_id
 			LEFT JOIN categories ca ON ca.category_id = c.category
 	
+			WHERE c.closed = 0			
+
 			GROUP BY c.company_id
 			ORDER BY c.company_id DESC';
 	
@@ -1100,7 +1102,8 @@ class Layout_Model
 					LEFT JOIN seo s ON s.company_id = c.company_id 
 					LEFT JOIN categories cat ON c.category = cat.category_id 
 					LEFT JOIN company_logo cl ON cl.company_id = c.company_id
-					WHERE c.main_promoted = 1';
+					WHERE c.main_promoted = 1 
+					ORDER BY c.company_id DESC';
 			return $this->db->getArray($query);
 		} catch (Exception $e) {
 			return false;
@@ -1161,6 +1164,30 @@ class Layout_Model
 		}
 	}
 	
+	public function getArchivedCompanies()
+	{
+		try {
+			$query = 'SELECT
+					c.company_id,
+					c.name,
+					c.published,
+					s.description,
+					cat.name as category,
+					cat.category_id,
+					cl.logo
+					FROM companies c
+					LEFT JOIN seo s ON s.company_id = c.company_id
+					LEFT JOIN categories cat ON c.category = cat.category_id
+					LEFT JOIN company_logo cl ON cl.company_id = c.company_id
+					WHERE c.closed = 1
+					ORDER BY c.company_id DESC
+					';
+			return $this->db->getArray($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
 	/**
 	 * getMainPromotedCompanies
 	 *
@@ -1175,6 +1202,19 @@ class Layout_Model
 					COUNT(*)
 					FROM companies c
 					WHERE c.published = 0';
+			return $this->db->getValue($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function getTotalArchivedCompanies()
+	{
+		try {
+			$query = 'SELECT
+					COUNT(*)
+					FROM companies c
+					WHERE c.closed = 1';
 			return $this->db->getValue($query);
 		} catch (Exception $e) {
 			return false;

@@ -55,6 +55,10 @@ if ($control->authorized)
 			$section = 'unpublished';
 			break;
 			
+		case 'archived':
+			$section = 'archived';
+			break;
+			
 		case 'location':
 			$section = 'location';
 			break;
@@ -74,6 +78,10 @@ if ($control->authorized)
 			
 		case 'unpublished':
 			$data['title'] 			= "Unpublished";
+			break;
+			
+		case 'archived':
+			$data['title'] 			= "Archived";
 			break;
 			
 		case 'location':

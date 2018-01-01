@@ -691,14 +691,14 @@ function publishCompany(pictureId)
 	
 	aMessage = '';
 	
-	if ($('#publish-company').hasClass('bg-purple'))
+	if ($('#publish-company').hasClass('bg-green')) // It is published
 	{
-		$('#publish-company').removeClass('bg-purple');
+		$('#publish-company').removeClass('bg-green');
 		aMessage = "OK, you just unpublished this company! <br> (¬､¬)";
 	}
 	else
 	{
-		$('#publish-company').addClass('bg-purple');
+		$('#publish-company').addClass('bg-green');
 		todo = 1;
 		aMessage = "This company it's published now! <br> ｡^‿^｡";
 	}
@@ -730,19 +730,20 @@ function publishCompany(pictureId)
 function closeCompany(pictureId)
 {
 	companyId 	= $('#companyId').val();
-	todo = 1;
-	aMessage = '';
+	todo 		= 1;
+	aMessage 	= '';
 	
-	if ($('#close-company').hasClass('bg-purple'))
+	
+	if ($('#close-company').hasClass('bg-red')) // it is closed
 	{
-		$('#close-company').removeClass('bg-purple');
-		aMessage = "OK, you just closed this company! <br> (¬､¬)";
+		$('#close-company').removeClass('bg-red');
+		todo = 0;
+		aMessage = "This company it's un-archived now! <br> ｡^‿^｡";
 	}
 	else
 	{
-		$('#close-company').addClass('bg-purple');
-		todo = 0;
-		aMessage = "This company it's opened now! <br> ｡^‿^｡";
+		$('#close-company').addClass('bg-red');
+		aMessage = "OK, you just archived this company! <br> (¬､¬)";
 	}
 	
     $.ajax({
@@ -811,7 +812,7 @@ function mainPromoteCompany()
 {
 	companyId 	= $('#companyId').val();
 	
-	if ($('#mainPromoteCompany').hasClass('bg-purple'))
+	if ($('#mainPromoteCompany').hasClass('bg-green'))
 	{
 		$.ajax({
 	        type:   'POST',
@@ -826,7 +827,7 @@ function mainPromoteCompany()
 	        {
 	            if ('1' == xml)
 	            {
-	            	$('#mainPromoteCompany').removeClass('bg-purple');
+	            	$('#mainPromoteCompany').removeClass('bg-green');
 	            	
 	            	bootbox.alert({
 	            	    message: "This company it's not longer promoted <br> ”(ᴗ_ ᴗ。)",
@@ -853,44 +854,44 @@ function mainPromoteCompany()
 			  {
 			      if (promoted)
 			      {
-			    	  nPromoted = promoted;
-			    	   if (nPromoted >= 8)
-			    	   {
-			    		   $('#mainPromoteCompany').removeClass('bg-purple');
-			    		   bootbox.alert({
-			            	    message: "There already 8 companies promoteded! <br> ¯\_(ツ)_/¯",
-			            	    size: 'small',
-			            	    backdrop: true
-			            	});
-			    	   }
-			    	   else
-			    	   {
-			    		    $.ajax({
-			    		        type:   'POST',
-			    		        url:    '/ajax/company.php',
-			    		        data:{  
-			    		        	companyId: 	companyId,
-			    		        	todo: 		1,
-			    		        	section: 	'mainPromoteCompany'
-			    		             },
-			    		        success:
-			    		        function(xml)
-			    		        {
-			    		            if ('1' == xml)
-			    		            {
-//			    		            	$('#cgid-'+pictureId).fadeOut();
-			    		            	$('#mainPromoteCompany').addClass('bg-purple');
-			    		            	
-			    		            	bootbox.alert({
-						            	    message: "This company it's main promoted now! <br> (~‾▿‾)~",
-						            	    size: 'small',
-						            	    backdrop: true
-						            	});
-			    		            }
-			    		        }
-			    		    });
-			    		   
-			    	   }
+				    	   nPromoted = promoted;
+				    	   if (nPromoted >= 8)
+				    	   {
+				    		   $('#mainPromoteCompany').removeClass('bg-green');
+				    		   bootbox.alert({
+				            	    message: "There already 8 companies promoted! <br> ¯\_(ツ)_/¯",
+				            	    size: 'small',
+				            	    backdrop: true
+				            	});
+				    	   }
+				    	   else
+				    	   {
+				    		    $.ajax({
+				    		        type:   'POST',
+				    		        url:    '/ajax/company.php',
+				    		        data:{  
+				    		        	companyId: 	companyId,
+				    		        	todo: 		1,
+				    		        	section: 	'mainPromoteCompany'
+				    		             },
+				    		        success:
+				    		        function(xml)
+				    		        {
+				    		            if ('1' == xml)
+				    		            {
+	//			    		            	$('#cgid-'+pictureId).fadeOut();
+				    		            	$('#mainPromoteCompany').addClass('bg-green');
+				    		            	
+				    		            	bootbox.alert({
+							            	    message: "This company it's main promoted now! <br> (~‾▿‾)~",
+							            	    size: 'small',
+							            	    backdrop: true
+							            	});
+				    		            }
+				    		        }
+				    		    });
+				    		   
+				    	   }
 			      }
 			  }
 		});
@@ -904,7 +905,7 @@ function promoteCompany()
 {
 	companyId 	= $('#companyId').val();
 	
-	if ($('#promoteCompany').hasClass('bg-purple'))
+	if ($('#promoteCompany').hasClass('bg-green'))
 	{
 		$.ajax({
 	        type:   'POST',
@@ -919,10 +920,10 @@ function promoteCompany()
 	        {
 	            if ('1' == xml)
 	            {
-	            	$('#promoteCompany').removeClass('bg-purple');
+	            	$('#promoteCompany').removeClass('bg-green');
 	            	
 	            	bootbox.alert({
-	            	    message: "This company it's not longer promoted <br> ”(ᴗ_ ᴗ。)",
+	            	    message: "This company is not longer promoted on it's category <br> ”(ᴗ_ ᴗ。)",
 	            	    size: 'small',
 	            	    backdrop: true
 	            	});
@@ -949,9 +950,9 @@ function promoteCompany()
 			    	  nPromoted = promoted;
 			    	   if (nPromoted >= 8)
 			    	   {
-			    		   $('#promoteCompany').removeClass('bg-purple');
+			    		   $('#promoteCompany').removeClass('bg-green');
 			    		   bootbox.alert({
-			            	    message: "There already 8 companies promoteded! <br> ¯\_(ツ)_/¯",
+			            	    message: "There already 8 companies promoted! <br> ¯\_(ツ)_/¯",
 			            	    size: 'small',
 			            	    backdrop: true
 			            	});
@@ -972,10 +973,10 @@ function promoteCompany()
 			    		            if ('1' == xml)
 			    		            {
 //			    		            	$('#cgid-'+pictureId).fadeOut();
-			    		            	$('#promoteCompany').addClass('bg-purple');
+			    		            	$('#promoteCompany').addClass('bg-green');
 			    		            	
 			    		            	bootbox.alert({
-						            	    message: "This company it's promoted now! <br> (~‾▿‾)~",
+						            	    message: "This company is promoted now on it's own category! <br> (~‾▿‾)~",
 						            	    size: 'small',
 						            	    backdrop: true
 						            	});

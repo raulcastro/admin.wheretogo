@@ -641,6 +641,7 @@ class Layout_View
                         </a>
                         <ul class="treeview-menu">
                             <li><a href="/admin/add-company/"><i class="fa fa-plus-square"></i> <?php echo _("Add company"); ?></a></li>
+                            <li><a href="/"><i class="fa fa-tag"></i> All</a></li>
                             <?php
 		   				    foreach ($this->data['categories'] as $c)
 		   				    {
@@ -659,7 +660,7 @@ class Layout_View
                     
                     <li>
 						<a href="/grid/promoted/">
-						<i class="fa fa-star"></i> <span>Promoted</span>
+						<i class="fa fa-star"></i> <span>Main Promoted</span>
 							<span class="pull-right-container">
 								<small class="label pull-right bg-blue"><?php echo $this->data['nPromoted']; ?></small>
 							</span>
@@ -671,6 +672,15 @@ class Layout_View
 						<i class="fa fa-ban"></i> <span>Unpublished</span>
 							<span class="pull-right-container">
 								<small class="label pull-right bg-red"><?php echo $this->data['nNoPublish']; ?></small>
+							</span>
+						</a>
+					</li>
+					
+					<li>
+						<a href="/grid/archived/">
+						<i class="fa fa-ban"></i> <span>Archived</span>
+							<span class="pull-right-container">
+								<small class="label pull-right bg-red"><?php echo $this->data['nNoArchived']; ?></small>
 							</span>
 						</a>
 					</li>
@@ -821,31 +831,117 @@ class Layout_View
 	    	ob_start();
 	    	?>
    		<div id="main-grid" class='row'>
-   		<?php
-   		foreach ($this->data['companies'] as $a)
-   		{
-   			$logo = "";
-   			if ($a['logo'])
-			{
-				$logo = "/media/companies/logo/".$a['logo'];
-			}
-			else {
-				$logo = "/dist/img/default/companies/logo/logo.jpg";
-			}
-		?>
-			<div class='col-lg-3 col-md-6 company-item'>
-				<div class="box box-primary">
-					<div class="box-body box-profile">
-						<a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><img class="profile-user-img img-responsive" src="<?php echo $logo; ?>" alt="User profile picture"></a>
-						<h3 class="profile-username text-center"><a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><?php echo $a['name']; ?></a></h3>
-						<p class="text-muted text-center"><?php echo $a['category']; ?></p>
+   			<?php 
+   			if ($_GET['hasPromoted']) :
+   			?>
+			<div class="col-md-12">
+				<div class="nav-tabs-custom">
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="#allCompanies" data-toggle="tab">All</a></li>
+						<li><a href="#promotedCompanies" data-toggle="tab">Promoted</a></li>
+					</ul>
+					<div class="tab-content">
+						<div class="active tab-pane" id="allCompanies">
+							<div class="row">
+								<?php
+						   		foreach ($this->data['companies'] as $a)
+						   		{
+						   			$logo = "";
+						   			if ($a['logo'])
+									{
+										$logo = "/media/companies/logo/".$a['logo'];
+									}
+									else {
+										$logo = "/dist/img/default/companies/logo/logo.jpg";
+									}
+								?>
+									<div class='col-lg-3 col-md-6 company-item'>
+										<div class="box box-primary">
+											<div class="box-body box-profile">
+												<a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><img class="profile-user-img img-responsive" src="<?php echo $logo; ?>" alt="User profile picture"></a>
+												<h3 class="profile-username text-center"><a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><?php echo $a['name']; ?></a></h3>
+												<p class="text-muted text-center"><?php echo $a['category']; ?></p>
+											</div>
+											<!-- /.box-body -->
+										</div>
+									</div>
+								<?php 
+								}
+								?>
+							</div>   	
+						</div>
+						<!-- /.tab-pane -->
+						<div class="tab-pane" id="promotedCompanies">
+							<div class="row">
+								<?php
+						   		foreach ($this->data['companies'] as $a)
+						   		{
+						   			$logo = "";
+						   			if ($a['logo'])
+									{
+										$logo = "/media/companies/logo/".$a['logo'];
+									}
+									else {
+										$logo = "/dist/img/default/companies/logo/logo.jpg";
+									}
+									
+									if ($a['promoted'] == 1)
+									{
+								?>
+									<div class='col-lg-3 col-md-6 company-item'>
+										<div class="box box-primary">
+											<div class="box-body box-profile">
+												<a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><img class="profile-user-img img-responsive" src="<?php echo $logo; ?>" alt="User profile picture"></a>
+												<h3 class="profile-username text-center"><a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><?php echo $a['name']; ?></a></h3>
+												<p class="text-muted text-center"><?php echo $a['category']; ?></p>
+											</div>
+											<!-- /.box-body -->
+										</div>
+									</div>
+								<?php 
+									}
+								}
+								?>
+							</div>
+						</div>
+						<!-- /.tab-pane -->
 					</div>
-					<!-- /.box-body -->
+					<!-- /.tab-content -->
 				</div>
+				<!-- /.nav-tabs-custom -->
 			</div>
-		<?php 
-		}
-		?>
+			<?php 
+			else : 
+			?>
+			<?php
+	   		foreach ($this->data['companies'] as $a)
+	   		{
+	   			$logo = "";
+	   			if ($a['logo'])
+				{
+					$logo = "/media/companies/logo/".$a['logo'];
+				}
+				else {
+					$logo = "/dist/img/default/companies/logo/logo.jpg";
+				}
+			?>
+				<div class='col-lg-3 col-md-6 company-item'>
+					<div class="box box-primary">
+						<div class="box-body box-profile">
+							<a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><img class="profile-user-img img-responsive" src="<?php echo $logo; ?>" alt="User profile picture"></a>
+							<h3 class="profile-username text-center"><a href="/edit-company/main/<?php echo $a['company_id']; ?>/<?php echo Tools::slugify($a['name']); ?>/" ><?php echo $a['name']; ?></a></h3>
+							<p class="text-muted text-center"><?php echo $a['category']; ?></p>
+						</div>
+						<!-- /.box-body -->
+					</div>
+				</div>
+			<?php 
+			}
+			?>
+			<?php
+			endif;
+			?>
+   		
 		</div>
    		<?php		
    		$items = ob_get_contents();
@@ -1003,7 +1099,6 @@ class Layout_View
 							   						<?php
 							   					}
 							   					?>
-											
 											</div>
 											<!-- /.widget-user-image -->
 											<h3 class="widget-user-username"><?php echo $this->data['company']['general']['name']; ?></h3>
@@ -1262,7 +1357,6 @@ class Layout_View
 												}
 												?>
 											</div>
-											
 										</div>
 									</div>
 								</div>
@@ -1388,7 +1482,7 @@ class Layout_View
 			                  	</div>
 			                  	
 			                  	<div class="form-group">
-			                    	<label for="inputName" class="col-sm-1 control-label">Website</label>
+			                    		<label for="inputName" class="col-sm-1 control-label">Website</label>
 									<div class="col-sm-11">
 										<input type="" class="form-control" id="companyWebsite" placeholder="website" value="<?php echo $this->data['company']['general']['website']; ?>">
 									</div>
@@ -1584,8 +1678,8 @@ class Layout_View
 							{
 								?>
 								<div class="form-group">
-									<div class="col-sm-2">
-										<button type="button" id="mainPromoteCompany" class="btn btn-block btn-info <?php if ($this->data['company']['general']['main_promoted'] == 1){ echo 'bg-purple';} ?>">Main Promoted</button>
+									<div class="col-sm-4">
+										<button type="button" id="mainPromoteCompany" class="btn btn-block btn-default <?php if ($this->data['company']['general']['main_promoted'] == 1){ echo 'bg-green';} ?>">Main Promoted</button>
 									</div>
 									<div class="col-sm-10"></div>
 								</div>
@@ -1598,41 +1692,17 @@ class Layout_View
 							{
 								?>
 								<div class="form-group">
-									<div class="col-sm-2">
-										<button type="button" id="promoteCompany" class="btn btn-block btn-info <?php if ($this->data['company']['general']['promoted'] == 1){ echo 'bg-purple';} ?>">Promoted</button>
+									<div class="col-sm-4">
+										<button type="button" id="promoteCompany" class="btn btn-block btn-default <?php if ($this->data['company']['general']['promoted'] == 1){ echo 'bg-green';} ?>">Category Promoted</button>
 									</div>
 									<div class="col-sm-10"></div>
 								</div>
 							<?php 
 							}
 							?>
-								
-								<!-- 
 								<div class="form-group">
-									<div class="col-sm-2">
-										<button type="button" class="btn btn-block btn-info">Phones Hidden</button>
-									</div>
-									<div class="col-sm-10"></div>
-								</div>
-								
-								<div class="form-group">
-									<div class="col-sm-2">
-										<button type="button" class="btn btn-block btn-info">E-Mails Hidden</button>
-									</div>
-									<div class="col-sm-10"></div>
-								</div>
-								
-								<div class="form-group">
-									<div class="col-sm-2">
-										<button type="button" class="btn btn-block btn-info">Website Hidden</button>
-									</div>
-									<div class="col-sm-10"></div>
-								</div>
-								 -->
-								
-								<div class="form-group">
-									<div class="col-sm-2">
-										<button type="button" id="publish-company" class="btn btn-block btn-info <?php if ($this->data['company']['general']['published'] == 1){ echo 'bg-purple';} ?>">Published</button>
+									<div class="col-sm-4">
+										<button type="button" id="publish-company" class="btn btn-block btn-default <?php if ($this->data['company']['general']['published'] == 1){ echo 'bg-green';} ?>">Published</button>
 									</div>
 									<div class="col-sm-10"></div>
 								</div>
@@ -1642,21 +1712,14 @@ class Layout_View
 								{
 									?>
 								<div class="form-group">
-									<div class="col-sm-2">
-										<button type="button" id="close-company" class="btn btn-block btn-info <?php if ($this->data['company']['general']['closed'] == 0){ echo 'bg-purple';} ?>">Open</button>
+									<div class="col-sm-4">
+										<button type="button" id="close-company" class="btn btn-block btn-default <?php if ($this->data['company']['general']['closed'] == 1){ echo 'bg-red';} ?>">Archived</button>
 									</div>
 									<div class="col-sm-10"></div>
 								</div>
 								<?php 
 								}
 								?>
-								
-								<div class="form-group">
-									<div class="col-sm-2">
-										<button type="button" class="btn btn-block btn-danger">Delete</button>
-									</div>
-									<div class="col-sm-10"></div>
-								</div>
 							</form>
 						</div>
 						<!-- /.tab-pane -->

@@ -61,7 +61,7 @@ switch ($_GET['option'])
 			 
 			if ($model -> cropImage($_POST, $dstWidth, $dstImageHeight, $source, $destination))
 			{
-					echo '1';
+				echo '1';
 			}
 			else
 			{

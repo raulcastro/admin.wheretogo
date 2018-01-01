@@ -55,7 +55,7 @@ class generalBackend
 				'twitter' 		=> $appInfoRow['twitter'],
 				'facebook' 		=> $appInfoRow['facebook'],
 				'googleplus' 	=> $appInfoRow['googleplus'],
-				'pinterest' 	=> $appInfoRow['pinterest'],
+				'pinterest' 		=> $appInfoRow['pinterest'],
 				'linkedin' 		=> $appInfoRow['linkedin'],
 				'youtube' 		=> $appInfoRow['youtube'],
 				'instagram'		=> $appInfoRow['instagram'],
@@ -82,6 +82,8 @@ class generalBackend
 		
 		$data['nNoPublish'] = $this->model->getTotalNotPublisedCompanies();
 		
+		$data['nNoArchived'] = $this->model->getTotalArchivedCompanies();
+		
 		switch ($section)
 		{
 			case 'companies':
@@ -96,8 +98,8 @@ class generalBackend
 				break;
 				
 			case 'byCategory':
-				$data['companies'] = $this->model->getCompaniesByCategoryId($_GET['categoryId']);
-				$data['categoryInfo'] = $this->model->getCategoryInfoById($_GET['categoryId']);
+				$data['companies'] 		= $this->model->getCompaniesByCategoryId($_GET['categoryId']);
+				$data['categoryInfo'] 	= $this->model->getCategoryInfoById($_GET['categoryId']);
 				break;
 				
 			case 'location':
@@ -108,6 +110,12 @@ class generalBackend
 			case 'unpublished':
 				// 		get Promoted companies
 				$companiesArray = $this->model->getMainUnpublishedCompanies();
+				$data['companies'] = $companiesArray;
+				break;
+				
+			case 'archived':
+				// 		get Archived companies
+				$companiesArray = $this->model->getArchivedCompanies();
 				$data['companies'] = $companiesArray;
 				break;
 				
