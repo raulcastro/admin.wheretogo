@@ -51,6 +51,10 @@ if ($control->authorized)
 			$section = 'promoted';
 			break;
 			
+		case 'published':
+			$section = 'published';
+			break;
+			
 		case 'unpublished':
 			$section = 'unpublished';
 			break;
@@ -74,6 +78,10 @@ if ($control->authorized)
 			
 		case 'promoted':
 			$data['title'] 			= "Promoted";
+			break;
+		
+		case 'published':
+			$data['title'] 			= "Published";
 			break;
 			
 		case 'unpublished':

@@ -80,6 +80,8 @@ class generalBackend
 		
 		$data['nPromoted'] = $this->model->getTotalMainPromotedCompanies();
 		
+		$data['nPublished'] = $this->model->getTotalPublishedCompanies();
+		
 		$data['nNoPublish'] = $this->model->getTotalNotPublisedCompanies();
 		
 		$data['nNoArchived'] = $this->model->getTotalArchivedCompanies();
@@ -105,6 +107,12 @@ class generalBackend
 			case 'location':
 				// 		get Promoted companies
 				$data['companies'] = $this->model->getCompaniesByLocation($_GET['locationId']);
+				break;
+			
+			case 'published':
+				// 		get Promoted companies
+				$companiesArray = $this->model->getMainPublishedCompanies();
+				$data['companies'] = $companiesArray;
 				break;
 				
 			case 'unpublished':

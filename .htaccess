@@ -31,6 +31,7 @@ RewriteRule ^admin/add-company/$ /admin/add-company.php?1&section=2
 RewriteRule ^dashboard/$ 								/dashboard.php?section=3
 RewriteRule ^grid/category/([0-9]+)/([A-Za-z0-9-]+)/$ 	/grid.php?infoRequest=category&categoryId=$1&hasPromoted=1
 RewriteRule ^grid/promoted/$ 							/grid.php?infoRequest=promoted
+RewriteRule ^grid/published/$ 							/grid.php?infoRequest=published
 RewriteRule ^grid/unpublished/$ 							/grid.php?infoRequest=unpublished
 RewriteRule ^grid/archived/$ 							/grid.php?infoRequest=archived
 RewriteRule ^grid/location/([0-9]+)/([A-Za-z0-9-]+)/$ 	/grid.php?infoRequest=location&locationId=$1

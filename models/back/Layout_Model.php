@@ -1133,6 +1133,30 @@ class Layout_Model
 		}
 	}
 	
+	public function getMainPublishedCompanies()
+	{
+		try {
+			$query = 'SELECT
+					c.company_id,
+					c.name,
+					c.published,
+					s.description,
+					cat.name as category,
+					cat.category_id,
+					cl.logo
+					FROM companies c
+					LEFT JOIN seo s ON s.company_id = c.company_id
+					LEFT JOIN categories cat ON c.category = cat.category_id
+					LEFT JOIN company_logo cl ON cl.company_id = c.company_id
+					WHERE c.published = 1
+					ORDER BY c.company_id DESC
+					';
+			return $this->db->getArray($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
 	/**
 	 * getMainPromotedCompanies
 	 *
@@ -1183,6 +1207,19 @@ class Layout_Model
 					ORDER BY c.company_id DESC
 					';
 			return $this->db->getArray($query);
+		} catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function getTotalPublishedCompanies()
+	{
+		try {
+			$query = 'SELECT
+					COUNT(*)
+					FROM companies c
+					WHERE c.published = 1';
+			return $this->db->getValue($query);
 		} catch (Exception $e) {
 			return false;
 		}

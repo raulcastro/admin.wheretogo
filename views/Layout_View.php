@@ -668,6 +668,15 @@ class Layout_View
 					</li>
 					
 					<li>
+						<a href="/grid/published/">
+						<i class="fa fa-ban"></i> <span>Published</span>
+							<span class="pull-right-container">
+								<small class="label pull-right bg-green"><?php echo $this->data['nPublished']; ?></small>
+							</span>
+						</a>
+					</li>
+					
+					<li>
 						<a href="/grid/unpublished/">
 						<i class="fa fa-ban"></i> <span>Unpublished</span>
 							<span class="pull-right-container">
