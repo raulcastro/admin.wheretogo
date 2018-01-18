@@ -1181,7 +1181,7 @@ class Layout_Model
 					LEFT JOIN seo s ON s.company_id = c.company_id
 					LEFT JOIN categories cat ON c.category = cat.category_id
 					LEFT JOIN company_logo cl ON cl.company_id = c.company_id
-					WHERE c.published = 0
+					WHERE c.published = 0 AND c.closed = 0
 					ORDER BY c.company_id DESC
 					';
 			return $this->db->getArray($query);
