@@ -1149,7 +1149,9 @@ class Layout_Model
 					LEFT JOIN categories cat ON c.category = cat.category_id
 					LEFT JOIN company_logo cl ON cl.company_id = c.company_id
 					WHERE c.published = 1
+					GROUP BY c.company_id					
 					ORDER BY c.company_id DESC
+					
 					';
 			return $this->db->getArray($query);
 		} catch (Exception $e) {
@@ -2051,6 +2053,23 @@ class Layout_Model
 			return $this->db->run($query);
 		}
 		catch (Exception $e)
+		{
+			return false;
+		}
+	}
+	
+	public function updateCategoryBanner($categoryId, $categoryName)
+	{
+		try {
+			$query = 'UPDATE categories
+					SET banner = ?
+					WHERE category_id = ? ';
+			$prep = $this->db->prepare($query);
+			$prep->bind_param('si',
+					$categoryName,
+					$categoryId);
+			return $prep->execute();
+		} catch (Exception $e)
 		{
 			return false;
 		}

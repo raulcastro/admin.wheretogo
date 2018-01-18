@@ -17,10 +17,10 @@ switch ($_GET['option'])
 		
 		$uploader 	= new Media_Model($allowedExtensions, $sizeLimit);
 		
-		$savePath 	= $root.'/media/companies/original/';
-		$medium 		= $root.'/media/companies/medium/';
-		$pre	  		= 'logo-'.Tools::slugify($_POST['companyName']);
-		$mediumWidth = 300;
+		$savePath 		= $root.'/media/categories/banners/';
+		$medium 		= $root.'/media/categories/banners-md/';
+		$pre	  		= 'banner-'.Tools::slugify($_POST['categoryName']);
+		$mediumWidth 	= 300;
 		
 		if ($result = $uploader->handleUpload($savePath, $pre))
 		{
@@ -37,12 +37,7 @@ switch ($_GET['option'])
 			
 			if ($newData)
 			{
-				if ($_POST['lastIdLogo'] > 0) {
-					if ($model->updateCompanyLogo($_POST['lastIdLogo'], $result['fileName']))
-						$lastId = $_POST['lastIdLogo'];
-				} else {
-					$lastId = $model->addCompanyLogo($_POST['companyId'], $result['fileName']);
-				}
+				$model->updateCategoryBanner($_POST['categoryId'], $result['fileName']);
 			}
 		
 			$data  = array('success'=>true, 'fileName'=>$result['fileName'],

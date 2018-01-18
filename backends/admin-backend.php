@@ -71,20 +71,20 @@ class generalBackend
 		$data['userInfo'] 			= $userInfoRow;
 		
 		// 		Categories
-		$data['categories'] = $this->model->getCategoriesWithCompanies();
+		$data['categories']		= $this->model->getCategoriesWithCompanies();
 		
 		// 		Locations
-		$data['locations'] = $this->model->getLocations();
+		$data['locations'] 		= $this->model->getLocations();
 		
-		$data['nCompanies'] = $this->model->getTotalCompanies();
+		$data['nCompanies'] 	= $this->model->getTotalCompanies();
 		
-		$data['nPromoted'] = $this->model->getTotalMainPromotedCompanies();
+		$data['nPromoted'] 		= $this->model->getTotalMainPromotedCompanies();
 		
-		$data['nPublished'] = $this->model->getTotalPublishedCompanies();
+		$data['nPublished'] 	= $this->model->getTotalPublishedCompanies();
 		
-		$data['nNoPublish'] = $this->model->getTotalNotPublisedCompanies();
+		$data['nNoPublish'] 	= $this->model->getTotalNotPublisedCompanies();
 		
-		$data['nNoArchived'] = $this->model->getTotalArchivedCompanies();
+		$data['nNoArchived']	= $this->model->getTotalArchivedCompanies();
 		
 		switch ($section)
 		{

@@ -83,7 +83,7 @@ class Layout_View
 					break;
 					
 				case 'dashboard':
-					# code...
+					echo self::getGridHead();
 					break;
 					
 				case 'main-gallery':
@@ -190,6 +190,10 @@ class Layout_View
 					
 				case 'add-company':
 					echo self::getAddCompanyScripts();
+					break;
+					
+				case 'dashboard':
+					echo self::getGridScripts();
 					break;
 					
 				case 'main-gallery':
@@ -807,6 +811,30 @@ class Layout_View
    		return $dashboardIcons;
    	}
    	
+   	public function getGridHead()
+   	{
+   		ob_start();
+   		?>
+  		<link href="/plugins/jquery.uploadfile/uploadfile.css" rel="stylesheet">
+    		<?php
+	    	$head = ob_get_contents();
+	    	ob_end_clean();
+	    	return $head;
+    }
+    
+    public function getGridScripts()
+    {
+	    	ob_start();
+	    	?>
+    		<script src="/plugins/jquery.uploadfile/jquery.uploadfile.min.js"></script>
+		<script src="/dist/js/grid.js"></script>
+		
+	    	<?php
+	    	$scripts = ob_get_contents();
+	    	ob_end_clean();
+	    	return $scripts;
+    }
+   	
    	/**
    	 * getGridContent
    	 * it returns the structure of the grid
@@ -839,7 +867,9 @@ class Layout_View
     {
 	    	ob_start();
 	    	?>
-   		<div id="main-grid" class='row'>
+		    <input type="hidden" id="categoryId" value="<?php echo $_GET['categoryId']; ?>" />
+		    <input type="hidden" id="category" value="<?php echo $_GET['category']; ?>" />
+	   		<div id="main-grid" class='row'>
    			<?php 
    			if ($_GET['hasPromoted']) :
    			?>
@@ -848,6 +878,7 @@ class Layout_View
 					<ul class="nav nav-tabs">
 						<li class="active"><a href="#allCompanies" data-toggle="tab">All</a></li>
 						<li><a href="#promotedCompanies" data-toggle="tab">Promoted</a></li>
+						<li><a href="#settingsCategory" data-toggle="tab">Settings</a></li>
 					</ul>
 					<div class="tab-content">
 						<div class="active tab-pane" id="allCompanies">
@@ -914,6 +945,37 @@ class Layout_View
 							</div>
 						</div>
 						<!-- /.tab-pane -->
+						
+						<div class="tab-pane" id="settingsCategory">
+							<div class="row">
+								<input type="hidden" id="logoId" value="<?php echo $this->data['company']['logo']['logo_id']; ?>" />
+								<input type="hidden" id="companyNameClean" value="<?php echo Tools::slugify($this->data['company']['general']['name']); ?>" />
+								
+								<div class="col-md-12">
+									<div class="mediaSections" >
+										<h2>Banner</h2>
+										<p class="text-muted">(1920px / 900px | JPG)</p>
+										
+										<div class="">
+											<div class="banner-uploader">
+												Upload
+											</div>
+											<div class="">
+												<div style="width: 300px; height:150px" class="crop-container-logo"> <img src="/media/categories/banners-md/<?php echo $this->data['categoryInfo']['banner']; ?>" id="categoryBanner" /></div>
+											</div>
+											<br>
+											<div class="form-group">
+												<div class="col-sm-12">
+													<button type="submit" class="btn btn-success" id="save-crop-logo">Save</button>
+												</div>
+											</div>
+											
+											<div class="clr"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 					<!-- /.tab-content -->
 				</div>
@@ -963,7 +1025,7 @@ class Layout_View
     {
     	ob_start();
     	?>
-    	<!-- bootstrap wysihtml5 - text editor -->
+    		<!-- bootstrap wysihtml5 - text editor -->
   		<link rel="stylesheet" href="/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
   		<link href="/plugins/jquery.uploadfile/uploadfile.css" rel="stylesheet">
   		<link href="/plugins/jquery.drag-n-crop/jquery.drag-n-crop.css" rel="stylesheet" type="text/css">
@@ -971,7 +1033,7 @@ class Layout_View
   		<link rel="stylesheet" href="/plugins/select2/select2.min.css">
   		<!-- bootstrap datepicker -->
   		<link rel="stylesheet" href="/plugins/datepicker/datepicker3.css">
-    	<script type="text/javascript"></script>
+    		<script type="text/javascript"></script>
     	<?php
     	$head = ob_get_contents();
     	ob_end_clean();
@@ -982,11 +1044,11 @@ class Layout_View
     {
     	ob_start();
     	?>
-    	<script src="/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
+    		<script src="/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js"></script>
     	
-    	<script src="/plugins/jQueryUI/jquery-ui.min.js"></script>
-    	<script src="/plugins/jquery.uploadfile/jquery.uploadfile.min.js"></script>
-    	<script src="/plugins/imagesloaded/imagesloaded.js"></script>
+    		<script src="/plugins/jQueryUI/jquery-ui.min.js"></script>
+    		<script src="/plugins/jquery.uploadfile/jquery.uploadfile.min.js"></script>
+    		<script src="/plugins/imagesloaded/imagesloaded.js"></script>
 		<script src="/dist/js/scale.fix.js"></script>
 		<script src="/plugins/jquery.drag-n-crop/jquery.drag-n-crop.js"></script>
 		<!-- Select2 -->
@@ -994,11 +1056,11 @@ class Layout_View
 		<!-- bootstrap datepicker -->
 		<script src="/plugins/datepicker/bootstrap-datepicker.js"></script>
 		
-    	<script type="text/javascript">
+    		<script type="text/javascript">
     	$(function () {
     	    //bootstrap WYSIHTML5 - text editor
     	    $(".textarea").wysihtml5();
-		});
+	});
 
     	<?php 
     	$i 		= 0;
